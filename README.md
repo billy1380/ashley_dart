@@ -2,7 +2,6 @@
 
 A port of LibGDX's Ashley to dart in the hope that it can be used with flame
 
-
 ## Pools (and reflection)
 
-I have removed some pools and reflection because or the uncertainty related to mirrors in dart. I am going to add the features back in as I can think of solutions for the issues.
+I have replaced reflections dependant parts of the pool engine with a constructor based system where components are registered in the engine and can then be created and pooled.

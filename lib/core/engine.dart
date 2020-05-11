@@ -1,3 +1,4 @@
+import 'package:ashley_dart/core/component.dart';
 /*******************************************************************************
  * Copyright 2014 See AUTHORS file.
  *
@@ -24,6 +25,7 @@ import 'package:ashley_dart/core/family_manager.dart';
 import 'package:ashley_dart/core/system_manager.dart';
 import 'package:ashley_dart/signals/listener.dart';
 import 'package:ashley_dart/signals/signal.dart';
+import 'package:ashley_dart/utils/constructor_pool.dart';
 
 class _ComponentListener implements Listener<Entity> {
   final FamilyManager _familyManager;
@@ -94,9 +96,14 @@ class _EngineDelayedInformer implements BooleanInformer {
  * </ul>
  *
  * @author Stefan Bachmann
+ * 
+ * Dart version notes:
+ * To create components using the engine component constructors must be registered against their types
  */
 class Engine {
   static Family _empty = Family.all([]).get();
+
+  final Map<Type, Constructor> constructors = {};
 
   Listener<Entity> _componentAdded;
   Listener<Entity> _componentRemoved;
@@ -115,6 +122,28 @@ class Engine {
     _systemManager = SystemManager(_EngineSystemListener(this));
     _componentOperationHandler =
         ComponentOperationHandler(_EngineDelayedInformer(this));
+  }
+
+  /** 
+   * Adds a constructor for a type (used in lieu of reflection)
+   */
+  void registerType<T>(Type type, Constructor<T> constructor) {
+    constructors[type] = constructor;
+  }
+
+  /**
+	 * Creates a new Entity object.
+	 * @return @{@link Entity}
+	 */
+  Entity createEntity() {
+    return new Entity();
+  }
+
+  /**
+	 * Creates a new {@link Component}. To use that method your components must have a visible no-arg constructor
+	 */
+  T createComponent<T extends Component>(Type componentType) {
+    return constructors[componentType]();
   }
 
   /**
