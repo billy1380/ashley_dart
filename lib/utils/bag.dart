@@ -21,7 +21,7 @@ import 'dart:math';
  * Inspired by Artemis Bag.
  */
 class Bag<E> {
-  List<E> _data;
+  late List<E?> _data;
   int _size = 0;
 
   /**
@@ -29,7 +29,7 @@ class Bag<E> {
 	 * @param capacity the initial capacity of Bag.
 	 */
   Bag([int capacity = 64]) {
-    _data = List<E>(capacity);
+    _data = List.filled(capacity, null);
   }
 
   /**
@@ -37,8 +37,8 @@ class Bag<E> {
 	 * @param index
 	 * @return element that was removed from the Bag.
 	 */
-  E removeAt(int index) {
-    E e = _data[index]; // make copy of element to remove so it can be returned
+  E? removeAt(int index) {
+    E? e = _data[index]; // make copy of element to remove so it can be returned
     _data[index] = _data[--_size]; // overwrite item to remove with last element
     _data[_size] = null; // null last element, so gc can do its work
     return e;
@@ -48,9 +48,9 @@ class Bag<E> {
 	 * Removes and return the last object in the bag.
 	 * @return the last object in the bag, null if empty.
 	 */
-  E removeLast() {
+  E? removeLast() {
     if (_size > 0) {
-      E e = _data[--_size];
+      E? e = _data[--_size];
       _data[_size] = null;
       return e;
     }
@@ -66,7 +66,7 @@ class Bag<E> {
 	 */
   bool remove(E e) {
     for (int i = 0; i < _size; i++) {
-      E e2 = _data[i];
+      E? e2 = _data[i];
 
       if (e == e2) {
         _data[i] = _data[--_size]; // overwrite item to remove with last element
@@ -93,7 +93,7 @@ class Bag<E> {
   /**
 	 * @return the element at the specified position in Bag.
 	 */
-  E operator [](int index) {
+  E? operator [](int index) {
     return _data[index];
   }
 
@@ -161,13 +161,13 @@ class Bag<E> {
     _size = 0;
   }
 
-  /* private*/ void grow([int newCapacity]) {
+  /* private*/ void grow([int? newCapacity]) {
     if (newCapacity == null) {
       int newCapacity = (_data.length * 3) ~/ 2 + 1;
       grow(newCapacity);
     } else {
-      List<E> oldData = _data;
-      _data = List(newCapacity);
+      List<E?> oldData = _data;
+      _data = List.filled(newCapacity, null);
       for (int i = 0; i < oldData.length; i++) {
         _data[i] = oldData[i];
       }

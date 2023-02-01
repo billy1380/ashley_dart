@@ -19,7 +19,6 @@ import 'package:ashley_dart/core/entity_listener.dart';
 
 import 'package:ashley_dart/core/entity_system.dart';
 import 'package:ashley_dart/core/family.dart';
-import 'package:ashley_dart/utils/unmodifiable_list.dart';
 
 /**
  * A simple EntitySystem that processes each entity of a given family in the order specified by a comparator and calls
@@ -31,10 +30,10 @@ import 'package:ashley_dart/utils/unmodifiable_list.dart';
 abstract class SortedIteratingSystem extends EntitySystem
     implements EntityListener {
   Family _family;
-  List<Entity> _sortedEntities = [];
-  List<Entity> _entities;
-  bool _shouldSort;
-  Comparator<Entity> _comparator;
+  List<Entity?> _sortedEntities = [];
+  List<Entity>? _entities;
+  late bool _shouldSort;
+  Comparator<Entity?> _comparator;
 
   /**
 	 * Instantiates a system that will iterate over the entities described by the Family, with a specific priority.
@@ -44,7 +43,7 @@ abstract class SortedIteratingSystem extends EntitySystem
 	 */
   SortedIteratingSystem(this._family, this._comparator, [int priority = 0])
       : super(priority) {
-    _entities = unmodifiable(_sortedEntities);
+    _entities = List.unmodifiable(_sortedEntities);
   }
 
   /**
@@ -62,12 +61,12 @@ abstract class SortedIteratingSystem extends EntitySystem
   }
 
   @override
-  void addedToEngine(Engine engine) {
-    List<Entity> newEntities = engine[_family];
+  void addedToEngine(Engine? engine) {
+    List<Entity?> newEntities = engine![_family];
     _sortedEntities.clear();
-    if (newEntities.length > 0) {
+    if (newEntities.isNotEmpty) {
       for (int i = 0; i < newEntities.length; ++i) {
-        _sortedEntities.add(newEntities[i]);
+        _sortedEntities.add(newEntities[i]!);
       }
       _sortedEntities.sort(_comparator);
     }
@@ -76,20 +75,20 @@ abstract class SortedIteratingSystem extends EntitySystem
   }
 
   @override
-  void removedFromEngine(Engine engine) {
-    engine.removeEntityListener(this);
+  void removedFromEngine(Engine? engine) {
+    engine!.removeEntityListener(this);
     _sortedEntities.clear();
     _shouldSort = false;
   }
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     _sortedEntities.add(entity);
     _shouldSort = true;
   }
 
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     _sortedEntities.remove(entity);
     _shouldSort = true;
   }
@@ -105,7 +104,7 @@ abstract class SortedIteratingSystem extends EntitySystem
   /**
 	 * @return set of entities processed by the system
 	 */
-  List<Entity> get entities {
+  List<Entity?>? get entities {
     _sort();
     return _entities;
   }
@@ -123,5 +122,5 @@ abstract class SortedIteratingSystem extends EntitySystem
 	 * @param entity The current Entity being processed
 	 * @param deltaTime The delta time between the last and current frame
 	 */
-  void processEntity(Entity entity, double deltaTime);
+  void processEntity(Entity? entity, double deltaTime);
 }

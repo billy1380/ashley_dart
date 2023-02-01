@@ -23,20 +23,20 @@ class RemoveEntityListener implements EntityListener {
 
   const RemoveEntityListener(this._engine);
 
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     _engine.addEntity(Entity());
   }
 
-  void entityAdded(Entity entity) {}
+  void entityAdded(Entity? entity) {}
 }
 
 class AddEntityListener implements EntityListener {
   final Engine _engine;
 
   const AddEntityListener(this._engine);
-  void entityRemoved(Entity entity) {}
+  void entityRemoved(Entity? entity) {}
 
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     _engine.addEntity(Entity());
   }
 }
@@ -47,11 +47,11 @@ class NoFamilyRemoveEntityListener implements EntityListener {
 
   const NoFamilyRemoveEntityListener(this._family, this._engine);
 
-  void entityRemoved(Entity entity) {
-    if (_family.matches(entity)) _engine.addEntity(Entity());
+  void entityRemoved(Entity? entity) {
+    if (_family.matches(entity!)) _engine.addEntity(Entity());
   }
 
-  void entityAdded(Entity entity) {}
+  void entityAdded(Entity? entity) {}
 }
 
 class NoFamilyAddEntityListener implements EntityListener {
@@ -60,10 +60,10 @@ class NoFamilyAddEntityListener implements EntityListener {
 
   const NoFamilyAddEntityListener(this._family, this._engine);
 
-  void entityRemoved(Entity entity) {}
+  void entityRemoved(Entity? entity) {}
 
-  void entityAdded(Entity entity) {
-    if (_family.matches(entity)) _engine.addEntity(Entity());
+  void entityAdded(Entity? entity) {
+    if (_family.matches(entity!)) _engine.addEntity(Entity());
   }
 }
 
@@ -81,15 +81,15 @@ class ComponentHandlingEntityListener1 implements EntityListener {
   const ComponentHandlingEntityListener1(this.recorder);
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     recorder.addingComponentA();
-    entity.add(ComponentA());
+    entity!.add(ComponentA());
   }
 
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     recorder.removingComponentA();
-    entity.remove(ComponentA);
+    entity!.remove(ComponentA);
   }
 }
 
@@ -99,15 +99,15 @@ class ComponentHandlingEntityListener2 implements EntityListener {
   const ComponentHandlingEntityListener2(this.recorder);
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     recorder.addingComponentB();
-    entity.add(ComponentB());
+    entity!.add(ComponentB());
   }
 
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     recorder.removingComponentB();
-    entity.remove(ComponentB);
+    entity!.remove(ComponentB);
   }
 }
 

@@ -40,8 +40,8 @@ class SortedIteratingSystemMock extends SortedIteratingSystem {
   }
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
-    OrderComponent component = orderMapper[entity];
+  void processEntity(Entity? entity, double deltaTime) {
+    OrderComponent component = orderMapper[entity!]!;
     assertNotNull(component);
     assertFalse(expectedNames.isEmpty);
     assertEquals(expectedNames.removeAt(0), component.name);
@@ -49,8 +49,8 @@ class SortedIteratingSystemMock extends SortedIteratingSystem {
 }
 
 class OrderComponent implements Component {
-  String name;
-  int zLayer;
+  String? name;
+  int? zLayer;
 
   OrderComponent(String name, int zLayer) {
     this.name = name;
@@ -77,19 +77,19 @@ class IteratingComponentRemovalSystem extends SortedIteratingSystem {
             SortedIteratingSystemTest._compare);
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
-    int index = _im[entity].index;
+  void processEntity(Entity? entity, double deltaTime) {
+    int index = _im[entity!]!.index;
     if (index % 2 == 0) {
       entity.remove(SpyComponent);
       entity.remove(IndexComponent);
     } else {
-      _sm[entity].updates++;
+      _sm[entity]!.updates++;
     }
   }
 }
 
 class IteratingRemovalSystem extends SortedIteratingSystem {
-  Engine _e;
+  Engine? _e;
   ComponentMapper<SpyComponent> _sm;
   ComponentMapper<IndexComponent> _im;
 
@@ -100,18 +100,18 @@ class IteratingRemovalSystem extends SortedIteratingSystem {
             SortedIteratingSystemTest._compare);
 
   @override
-  void addedToEngine(Engine e) {
+  void addedToEngine(Engine? e) {
     super.addedToEngine(e);
     this._e = e;
   }
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
-    int index = _im[entity].index;
+  void processEntity(Entity? entity, double deltaTime) {
+    int index = _im[entity!]!.index;
     if (index % 2 == 0) {
-      _e.removeEntity(entity);
+      _e!.removeEntity(entity);
     } else {
-      _sm[entity].updates++;
+      _sm[entity]!.updates++;
     }
   }
 }
@@ -162,7 +162,7 @@ class SortedIteratingSystemTest {
 
   void entityRemovalWhileIterating() {
     Engine engine = Engine();
-    List<Entity> entities =
+    List<Entity?> entities =
         engine[Family.all([SpyComponent, IndexComponent]).get()];
     ComponentMapper<SpyComponent> sm = ComponentMapper.getFor(SpyComponent);
 
@@ -188,15 +188,15 @@ class SortedIteratingSystemTest {
     assertEquals(numEntities ~/ 2, entities.length);
 
     for (int i = 0; i < entities.length; ++i) {
-      Entity e = entities[i];
+      Entity e = entities[i]!;
 
-      assertEquals(1, sm[e].updates);
+      assertEquals(1, sm[e]!.updates);
     }
   }
 
   void componentRemovalWhileIterating() {
     Engine engine = Engine();
-    List<Entity> entities =
+    List<Entity?> entities =
         engine[Family.all([SpyComponent, IndexComponent]).get()];
     ComponentMapper<SpyComponent> sm = ComponentMapper.getFor(SpyComponent);
 
@@ -222,9 +222,9 @@ class SortedIteratingSystemTest {
     assertEquals(numEntities ~/ 2, entities.length);
 
     for (int i = 0; i < entities.length; ++i) {
-      Entity e = entities[i];
+      Entity e = entities[i]!;
 
-      assertEquals(1, sm[e].updates);
+      assertEquals(1, sm[e]!.updates);
     }
   }
 
@@ -261,10 +261,10 @@ class SortedIteratingSystemTest {
     system.expectedNames.add("C");
     engine.update(0);
 
-    orderMapper[a].zLayer = 3;
-    orderMapper[b].zLayer = 2;
-    orderMapper[c].zLayer = 1;
-    orderMapper[d].zLayer = 0;
+    orderMapper[a]!.zLayer = 3;
+    orderMapper[b]!.zLayer = 2;
+    orderMapper[c]!.zLayer = 1;
+    orderMapper[d]!.zLayer = 0;
     system.forceSort();
     system.expectedNames.add("D");
     system.expectedNames.add("C");
@@ -273,9 +273,13 @@ class SortedIteratingSystemTest {
     engine.update(0);
   }
 
-  static int _compare(Entity a, Entity b) {
-    OrderComponent ac = orderMapper[a];
-    OrderComponent bc = orderMapper[b];
-    return ac.zLayer > bc.zLayer ? 1 : (ac.zLayer == bc.zLayer) ? 0 : -1;
+  static int _compare(Entity? a, Entity? b) {
+    OrderComponent ac = orderMapper[a!]!;
+    OrderComponent bc = orderMapper[b!]!;
+    return ac.zLayer! > bc.zLayer!
+        ? 1
+        : (ac.zLayer == bc.zLayer)
+            ? 0
+            : -1;
   }
 }

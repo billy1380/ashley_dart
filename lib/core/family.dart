@@ -65,7 +65,7 @@ class FamilyBuilder {
   /** @return A family for the configured component types */
   Family get() {
     String hash = Family._getFamilyHash(_all, _one, _exclude);
-    Family family = Family._families[hash];
+    Family? family = Family._families[hash];
     if (family == null) {
       family = Family._(_all, _one, _exclude);
       Family._families[hash] = family;
@@ -102,7 +102,7 @@ class Family {
 
   /** @return Whether the entity matches the family requirements or not */
   bool matches(Entity entity) {
-    Bits entityComponentBits = entity.componentBits;
+    Bits entityComponentBits = entity.componentBits!;
 
     if (!entityComponentBits.containsAll(_all)) {
       return false;

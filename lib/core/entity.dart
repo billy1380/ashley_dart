@@ -20,7 +20,6 @@ import 'package:ashley_dart/core/component_type.dart';
 import 'package:ashley_dart/signals/signal.dart';
 import 'package:ashley_dart/utils/bag.dart';
 import 'package:ashley_dart/utils/bits.dart';
-import 'package:ashley_dart/utils/unmodifiable_list.dart';
 
 /**
  * Simple containers of {@link Component}s that give them "data". The component's data is then processed by {@link EntitySystem}s.
@@ -28,7 +27,7 @@ import 'package:ashley_dart/utils/unmodifiable_list.dart';
  */
 class Entity {
   /** A flag that can be used to bit mask this entity. Up to the user to manage. */
-  int flags;
+  int? flags;
   /** Will dispatch an event when a component is added. */
   final Signal<Entity> componentAdded;
   /** Will dispatch an event when a component is removed. */
@@ -36,21 +35,21 @@ class Entity {
 
   bool scheduledForRemoval = false;
   bool removing = false;
-  ComponentOperationHandler componentOperationHandler;
+  ComponentOperationHandler? componentOperationHandler;
 
-  Bag<Component> _components;
-  List<Component> _componentsArray;
-  List<Component> _immutableComponentsArray;
-  Bits _componentBits;
-  Bits _familyBits;
+  late Bag<Component?> _components;
+  List<Component>? _componentsArray;
+  List<Component>? _immutableComponentsArray;
+  Bits? _componentBits;
+  Bits? _familyBits;
 
   /** Creates an empty Entity. */
   Entity()
       : componentAdded = Signal<Entity>(),
         componentRemoved = Signal<Entity>() {
-    _components = Bag<Component>();
-    _componentsArray = List();
-    _immutableComponentsArray = unmodifiable(_componentsArray);
+    _components = Bag<Component?>();
+    _componentsArray = [];
+    _immutableComponentsArray = List.unmodifiable(_componentsArray!);
     _componentBits = Bits();
     _familyBits = Bits();
     flags = 0;
@@ -63,7 +62,7 @@ class Entity {
   Entity add(Component component) {
     if (addInternal(component)) {
       if (componentOperationHandler != null) {
-        componentOperationHandler.add(this);
+        componentOperationHandler!.add(this);
       } else {
         notifyComponentAdded();
       }
@@ -86,16 +85,16 @@ class Entity {
 	 * instance reference.
 	 * @return The removed {@link Component}, or null if the Entity did no contain such a component.
 	 */
-  Component remove(Type componentClass) {
+  Component? remove(Type componentClass) {
     ComponentType componentType = ComponentType.getFor(componentClass);
     int componentTypeIndex = componentType.index;
 
     if (_components.length > componentTypeIndex) {
-      Component removeComponent = _components[componentTypeIndex];
+      Component? removeComponent = _components[componentTypeIndex];
 
       if (removeComponent != null && removeInternal(componentClass) != null) {
         if (componentOperationHandler != null) {
-          componentOperationHandler.remove(this);
+          componentOperationHandler!.remove(this);
         } else {
           notifyComponentRemoved();
         }
@@ -109,13 +108,13 @@ class Entity {
 
   /** Removes all the {@link Component}'s from the Entity. */
   void removeAll() {
-    while (_componentsArray.length > 0) {
-      remove(_componentsArray.last.runtimeType);
+    while (_componentsArray!.isNotEmpty) {
+      remove(_componentsArray!.last.runtimeType);
     }
   }
 
   /** @return immutable collection with all the Entity {@link Component}s. */
-  List<Component> get components {
+  List<Component>? get components {
     return _immutableComponentsArray;
   }
 
@@ -127,15 +126,15 @@ class Entity {
 	 * @return the instance of the specified {@link Component} attached to this {@link Entity}, or null if no such
 	 *         {@link Component} exists.
 	 */
-  T getComponent<T extends Component>(Type componentClass) {
-    return this[ComponentType.getFor(componentClass)] as T;
+  T? getComponent<T extends Component?>(Type componentClass) {
+    return this[ComponentType.getFor(componentClass)] as T?;
   }
 
   /**
 	 * Internal use.
 	 * @return The {@link Component} object for the specified class, null if the Entity does not have any components for that class.
 	 */
-  Component operator [](ComponentType componentType) {
+  Component? operator [](ComponentType componentType) {
     int componentTypeIndex = componentType.index;
 
     if (componentTypeIndex < _components.length) {
@@ -149,18 +148,18 @@ class Entity {
 	 * @return Whether or not the Entity has a {@link Component} for the specified class.
 	 */
   bool hasComponent(ComponentType componentType) {
-    return _componentBits[componentType.index];
+    return _componentBits![componentType.index];
   }
 
   /**
 	 * @return This Entity's component bits, describing all the {@link Component}s it contains.
 	 */
-  Bits get componentBits {
+  Bits? get componentBits {
     return _componentBits;
   }
 
   /** @return This Entity's {@link Family} bits, describing all the {@link EntitySystem}s it currently is being processed by. */
-  Bits get familyBits {
+  Bits? get familyBits {
     return _familyBits;
   }
 
@@ -170,7 +169,7 @@ class Entity {
 	 */
   bool addInternal(Component component) {
     Type componentClass = component.runtimeType;
-    Component oldComponent = getComponent(componentClass);
+    Component? oldComponent = getComponent(componentClass);
 
     if (component == oldComponent) {
       return false;
@@ -182,8 +181,8 @@ class Entity {
 
     int componentTypeIndex = ComponentType.getIndexFor(componentClass);
     _components[componentTypeIndex] = component;
-    _componentsArray.add(component);
-    _componentBits.set(componentTypeIndex);
+    _componentsArray!.add(component);
+    _componentBits!.set(componentTypeIndex);
 
     return true;
   }
@@ -192,15 +191,15 @@ class Entity {
 	 * @param componentClass
 	 * @return the component if the specified class was found and removed. Otherwise, null
 	 */
-  Component removeInternal(Type componentClass) {
+  Component? removeInternal(Type componentClass) {
     ComponentType componentType = ComponentType.getFor(componentClass);
     int componentTypeIndex = componentType.index;
-    Component removeComponent = _components[componentTypeIndex];
+    Component? removeComponent = _components[componentTypeIndex];
 
     if (removeComponent != null) {
       _components[componentTypeIndex] = null;
-      _componentsArray.remove(removeComponent);
-      _componentBits.clear(componentTypeIndex);
+      _componentsArray!.remove(removeComponent);
+      _componentBits!.clear(componentTypeIndex);
 
       return removeComponent;
     }

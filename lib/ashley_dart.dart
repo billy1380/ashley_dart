@@ -23,4 +23,3 @@ export 'package:ashley_dart/systems/sorted_iterating_system.dart';
 
 export 'package:ashley_dart/utils/bits.dart';
 export 'package:ashley_dart/utils/pool.dart';
-export 'package:ashley_dart/utils/unmodifiable_list.dart';

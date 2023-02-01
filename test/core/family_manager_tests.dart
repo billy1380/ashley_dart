@@ -10,12 +10,12 @@ class ComponentC implements Component {}
 
 class ThrowingListener implements EntityListener {
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     throw new Exception("throwing");
   }
 
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     throw new Exception("throwing");
   }
 }
@@ -38,11 +38,11 @@ void main() {
 class FamilyManagerTests {
   void entitiesForFamily() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = unmodifiable(entities);
+    List<Entity> immutableEntities = List.unmodifiable(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Family family = Family.all([ComponentA, ComponentB]).get();
-    List<Entity> familyEntities = manager[family];
+    List<Entity?> familyEntities = manager[family];
 
     assertEquals(0, familyEntities.length);
 
@@ -84,7 +84,7 @@ class FamilyManagerTests {
 
   void entityForFamilyWithRemoval() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = unmodifiable(entities);
+    List<Entity> immutableEntities = List.unmodifiable(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Entity entity = Entity();
@@ -94,7 +94,7 @@ class FamilyManagerTests {
 
     manager.updateFamilyMembership(entity);
 
-    List<Entity> familyEntities =
+    List<Entity?> familyEntities =
         manager[Family.all([ComponentA]).get()];
 
     assertEquals(1, familyEntities.length);
@@ -112,11 +112,11 @@ class FamilyManagerTests {
 
   void entitiesForFamilyAfter() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = unmodifiable(entities);
+    List<Entity> immutableEntities = List.unmodifiable(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Family family = Family.all([ComponentA, ComponentB]).get();
-    List<Entity> familyEntities = manager[family];
+    List<Entity?> familyEntities = manager[family];
 
     assertEquals(0, familyEntities.length);
 
@@ -158,11 +158,11 @@ class FamilyManagerTests {
 
   void entitiesForFamilyWithRemoval() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = unmodifiable(entities);
+    List<Entity> immutableEntities = List.unmodifiable(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Family family = Family.all([ComponentA, ComponentB]).get();
-    List<Entity> familyEntities = manager[family];
+    List<Entity?> familyEntities = manager[family];
 
     Entity entity1 = Entity();
     Entity entity2 = Entity();
@@ -217,13 +217,13 @@ class FamilyManagerTests {
 
   void entitiesForFamilyWithRemovalAndFiltering() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = unmodifiable(entities);
+    List<Entity> immutableEntities = List.unmodifiable(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
-    List<Entity> entitiesWithComponentAOnly = manager
+    List<Entity?> entitiesWithComponentAOnly = manager
         [Family.all([ComponentA]).exclude([ComponentB]).get()];
 
-    List<Entity> entitiesWithComponentB =
+    List<Entity?> entitiesWithComponentB =
         manager[Family.all([ComponentB]).get()];
 
     Entity entity1 = Entity();
@@ -253,7 +253,7 @@ class FamilyManagerTests {
 
   void entityListenerThrows() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = unmodifiable(entities);
+    List<Entity> immutableEntities = List.unmodifiable(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     EntityListener listener = ThrowingListener();

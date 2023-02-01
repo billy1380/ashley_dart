@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-
-import 'package:ashley_dart/core/component_mapper.dart';
-
-import '../helpers.dart';
 import 'package:ashley_dart/ashley_dart.dart';
 import 'package:test/test.dart';
+
+import '../helpers.dart';
 
 const double deltaTime = 0.1;
 
@@ -27,7 +25,7 @@ class IntervalComponentSpy implements Component {
 }
 
 class IntervalIteratingSystemSpy extends IntervalIteratingSystem {
-  ComponentMapper<IntervalComponentSpy> _im;
+  late ComponentMapper<IntervalComponentSpy> _im;
 
   IntervalIteratingSystemSpy()
       : super(Family.all([IntervalComponentSpy]).get(), deltaTime * 2.0) {
@@ -35,8 +33,8 @@ class IntervalIteratingSystemSpy extends IntervalIteratingSystem {
   }
 
   @override
-  void processEntity(Entity entity) {
-    _im[entity].numUpdates++;
+  void processEntity(Entity? entity) {
+    _im[entity!]!.numUpdates++;
   }
 }
 
@@ -52,8 +50,7 @@ class IntervalIteratingTest {
   void intervalSystem() {
     Engine engine = Engine();
     IntervalIteratingSystemSpy intervalSystemSpy = IntervalIteratingSystemSpy();
-    List<Entity> entities =
-        engine[Family.all([IntervalComponentSpy]).get()];
+    List<Entity?> entities = engine[Family.all([IntervalComponentSpy]).get()];
     ComponentMapper<IntervalComponentSpy> im =
         ComponentMapper.getFor(IntervalComponentSpy);
 
@@ -69,7 +66,7 @@ class IntervalIteratingTest {
       engine.update(deltaTime);
 
       for (int j = 0; j < entities.length; ++j) {
-        assertEquals(i ~/ 2, im[entities[j]].numUpdates);
+        assertEquals(i ~/ 2, im[entities[j]!]!.numUpdates);
       }
     }
   }

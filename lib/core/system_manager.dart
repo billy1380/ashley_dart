@@ -1,5 +1,4 @@
 import 'package:ashley_dart/core/entity_system.dart';
-import 'package:ashley_dart/utils/unmodifiable_list.dart';
 
 typedef _SystemComparator = int Function(EntitySystem a, EntitySystem b);
 
@@ -10,20 +9,24 @@ abstract class SystemListener {
 
 class SystemManager {
   _SystemComparator _systemComparator = (EntitySystem a, EntitySystem b) {
-    return a.priority > b.priority ? 1 : (a.priority == b.priority) ? 0 : -1;
+    return a.priority > b.priority
+        ? 1
+        : (a.priority == b.priority)
+            ? 0
+            : -1;
   };
   List<EntitySystem> _systems = [];
-  List<EntitySystem> _immutableSystems;
+  List<EntitySystem>? _immutableSystems;
   Map<Type, EntitySystem> _systemsByClass = {};
   SystemListener _listener;
 
   SystemManager(this._listener) {
-    _immutableSystems = unmodifiable(_systems);
+    _immutableSystems = List.unmodifiable(_systems);
   }
 
   void addSystem(EntitySystem system) {
     Type systemType = system.runtimeType;
-    EntitySystem oldSytem = getSystem(systemType);
+    EntitySystem? oldSytem = getSystem(systemType);
 
     if (oldSytem != null) {
       removeSystem(oldSytem);
@@ -43,16 +46,16 @@ class SystemManager {
   }
 
   void removeAllSystems() {
-    while (_systems.length > 0) {
+    while (_systems.isNotEmpty) {
       removeSystem(_systems.first);
     }
   }
 
-  T getSystem<T extends EntitySystem>(Type systemType) {
-    return _systemsByClass[systemType] as T;
+  T? getSystem<T extends EntitySystem?>(Type systemType) {
+    return _systemsByClass[systemType] as T?;
   }
 
-  List<EntitySystem> getSystems() {
+  List<EntitySystem>? get systems {
     return _immutableSystems;
   }
 }

@@ -59,7 +59,7 @@ abstract class Pool<T> {
   /** Returns an object from this pool. The object may be new (from {@link #newObject()}) or reused (previously
 	 * {@link #free(Object) freed}). */
   T obtain() {
-    return _freeObjects.length == 0 ? newObject() : _freeObjects.removeLast();
+    return _freeObjects.isEmpty ? newObject() : _freeObjects.removeLast();
   }
 
   /** Puts the specified object in the pool, making it eligible to be returned by {@link #obtain()}. If the pool already contains
@@ -96,7 +96,6 @@ abstract class Pool<T> {
 	 * The pool does not check if an object is already freed, so the same object must not be freed multiple times.
 	 * @see #free(Object) */
   void freeAll(List<T> objects) {
-    if (objects == null) throw new Exception("objects cannot be null.");
     List<T> freeObjects = this._freeObjects;
     int maxCapacity = this.maxCapacity;
     for (int i = 0; i < objects.length; i++) {

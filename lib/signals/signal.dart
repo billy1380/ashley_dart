@@ -22,17 +22,17 @@ import 'package:ashley_dart/signals/listener.dart';
  * @author Stefan Bachmann
  */
 class Signal<T> {
-  List<Listener<T>> _listeners;
+  late List<Listener<T>?> _listeners;
 
   Signal() {
-    _listeners = List<Listener<T>>();
+    _listeners = [];
   }
 
   /**
 	 * Add a Listener to this Signal
 	 * @param listener The Listener to be added
 	 */
-  void add(Listener<T> listener) {
+  void add(Listener<T>? listener) {
     _listeners.add(listener);
   }
 
@@ -40,7 +40,7 @@ class Signal<T> {
 	 * Remove a listener from this Signal
 	 * @param listener The Listener to remove
 	 */
-  void remove(Listener<T> listener) {
+  void remove(Listener<T>? listener) {
     _listeners.remove(listener);
   }
 

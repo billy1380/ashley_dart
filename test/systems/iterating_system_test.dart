@@ -32,7 +32,7 @@ class IteratingSystemMock extends IteratingSystem {
   IteratingSystemMock(Family family) : super(family);
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
+  void processEntity(Entity? entity, double deltaTime) {
     ++numUpdates;
   }
 }
@@ -46,8 +46,8 @@ class IndexComponent implements Component {
 }
 
 class IteratingComponentRemovalSystem extends IteratingSystem {
-  ComponentMapper<SpyComponent> _sm;
-  ComponentMapper<IndexComponent> _im;
+  late ComponentMapper<SpyComponent> _sm;
+  late ComponentMapper<IndexComponent> _im;
 
   IteratingComponentRemovalSystem()
       : super(Family.all([SpyComponent, IndexComponent]).get()) {
@@ -56,13 +56,13 @@ class IteratingComponentRemovalSystem extends IteratingSystem {
   }
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
-    int index = _im[entity].index;
+  void processEntity(Entity? entity, double deltaTime) {
+    int index = _im[entity!]!.index;
     if (index % 2 == 0) {
       entity.remove(SpyComponent);
       entity.remove(IndexComponent);
     } else {
-      _sm[entity].updates++;
+      _sm[entity]!.updates++;
     }
   }
 }
@@ -77,17 +77,17 @@ class IteratingRemovalSystem extends IteratingSystem {
         super(Family.all([SpyComponent, IndexComponent]).get());
 
   @override
-  void addedToEngine(Engine engine) {
+  void addedToEngine(Engine? engine) {
     super.addedToEngine(engine);
   }
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
-    int index = _im[entity].index;
+  void processEntity(Entity? entity, double deltaTime) {
+    int index = _im[entity!]!.index;
     if (index % 2 == 0) {
-      engine.removeEntity(entity);
+      engine!.removeEntity(entity);
     } else {
-      _sm[entity].updates++;
+      _sm[entity]!.updates++;
     }
   }
 }
@@ -145,7 +145,7 @@ class IteratingSystemTest {
 
   void entityRemovalWhileIterating() {
     Engine engine = Engine();
-    List<Entity> entities =
+    List<Entity?> entities =
         engine[Family.all([SpyComponent, IndexComponent]).get()];
     ComponentMapper<SpyComponent> sm = ComponentMapper.getFor(SpyComponent);
 
@@ -170,15 +170,15 @@ class IteratingSystemTest {
     assertEquals(numEntities ~/ 2, entities.length);
 
     for (int i = 0; i < entities.length; ++i) {
-      Entity e = entities[i];
+      Entity e = entities[i]!;
 
-      assertEquals(1, sm[e].updates);
+      assertEquals(1, sm[e]!.updates);
     }
   }
 
   void componentRemovalWhileIterating() {
     Engine engine = Engine();
-    List<Entity> entities =
+    List<Entity?> entities =
         engine[Family.all([SpyComponent, IndexComponent]).get()];
     ComponentMapper<SpyComponent> sm = ComponentMapper.getFor(SpyComponent);
 
@@ -203,9 +203,9 @@ class IteratingSystemTest {
     assertEquals(numEntities ~/ 2, entities.length);
 
     for (int i = 0; i < entities.length; ++i) {
-      Entity e = entities[i];
+      Entity e = entities[i]!;
 
-      assertEquals(1, sm[e].updates);
+      assertEquals(1, sm[e]!.updates);
     }
   }
 }

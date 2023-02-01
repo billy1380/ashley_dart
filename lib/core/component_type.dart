@@ -41,7 +41,7 @@ class ComponentType {
 	 * @return A ComponentType matching the Component Class
 	 */
   static ComponentType getFor(Type componentType) {
-    ComponentType type = assignedComponentTypes[componentType];
+    ComponentType? type = assignedComponentTypes[componentType];
 
     if (type == null) {
       type = ComponentType._();

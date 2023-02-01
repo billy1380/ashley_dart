@@ -3,11 +3,10 @@ import 'package:ashley_dart/core/entity_listener.dart';
 import 'package:ashley_dart/core/family.dart';
 import 'package:ashley_dart/utils/bits.dart';
 import 'package:ashley_dart/utils/pool.dart';
-import 'package:ashley_dart/utils/unmodifiable_list.dart';
 
 class _EntityListenerData {
-  EntityListener _listener;
-  int _priority;
+  EntityListener? _listener;
+  late int _priority;
 }
 
 class _BitsPool extends Pool<Bits> {
@@ -18,19 +17,19 @@ class _BitsPool extends Pool<Bits> {
 }
 
 class FamilyManager {
-  List<Entity> entities;
-  Map<Family, List<Entity>> _families = {};
-  Map<Family, List<Entity>> _immutableFamilies = {};
+  List<Entity?>? entities;
+  Map<Family, List<Entity?>> _families = {};
+  Map<Family, List<Entity?>> _immutableFamilies = {};
   List<_EntityListenerData> _entityListeners = [];
   Map<Family, Bits> _entityListenerMasks = {};
   _BitsPool _bitsPool = _BitsPool();
   bool _notifying = false;
 
-  FamilyManager(List<Entity> entities) {
+  FamilyManager(List<Entity?>? entities) {
     this.entities = entities;
   }
 
-  List<Entity> operator [](Family family) {
+  List<Entity?> operator [](Family family) {
     return _registerFamily(family);
   }
 
@@ -38,7 +37,8 @@ class FamilyManager {
     return _notifying;
   }
 
-  void addEntityListener(Family family, int priority, EntityListener listener) {
+  void addEntityListener(
+      Family family, int priority, EntityListener? listener) {
     _registerFamily(family);
 
     int insertionIndex = 0;
@@ -62,7 +62,7 @@ class FamilyManager {
       mask.clear(insertionIndex);
     }
 
-    _entityListenerMasks[family].set(insertionIndex);
+    _entityListenerMasks[family]!.set(insertionIndex);
 
     _EntityListenerData entityListenerData = _EntityListenerData();
     entityListenerData._listener = listener;
@@ -90,7 +90,7 @@ class FamilyManager {
     }
   }
 
-  void updateFamilyMembership(Entity entity) {
+  void updateFamilyMembership(Entity? entity) {
     // Find families that the entity was added to/removed from, and fill
     // the bitmasks with corresponding listener bits.
     Bits addListenerBits = _bitsPool.obtain();
@@ -98,21 +98,21 @@ class FamilyManager {
 
     for (Family family in _entityListenerMasks.keys) {
       final int familyIndex = family.index;
-      final Bits entityFamilyBits = entity.familyBits;
+      final Bits entityFamilyBits = entity!.familyBits!;
 
       bool belongsToFamily = entityFamilyBits[familyIndex];
       bool matches = family.matches(entity) && !entity.removing;
 
       if (belongsToFamily != matches) {
-        final Bits listenersMask = _entityListenerMasks[family];
-        final List<Entity> familyEntities = _families[family];
+        final Bits? listenersMask = _entityListenerMasks[family];
+        final List<Entity?>? familyEntities = _families[family];
         if (matches) {
-          addListenerBits.or(listenersMask);
-          familyEntities.add(entity);
+          addListenerBits.or(listenersMask!);
+          familyEntities!.add(entity);
           entityFamilyBits.set(familyIndex);
         } else {
-          removeListenerBits.or(listenersMask);
-          familyEntities.remove(entity);
+          removeListenerBits.or(listenersMask!);
+          familyEntities!.remove(entity);
           entityFamilyBits.clear(familyIndex);
         }
       }
@@ -126,13 +126,13 @@ class FamilyManager {
       for (int i = removeListenerBits.nextSetBit(0);
           i >= 0;
           i = removeListenerBits.nextSetBit(i + 1)) {
-        (items[i] as _EntityListenerData)._listener.entityRemoved(entity);
+        (items[i] as _EntityListenerData)._listener!.entityRemoved(entity);
       }
 
       for (int i = addListenerBits.nextSetBit(0);
           i >= 0;
           i = addListenerBits.nextSetBit(i + 1)) {
-        (items[i] as _EntityListenerData)._listener.entityAdded(entity);
+        (items[i] as _EntityListenerData)._listener!.entityAdded(entity);
       }
     } finally {
       addListenerBits.clear();
@@ -143,21 +143,21 @@ class FamilyManager {
     }
   }
 
-  List<Entity> _registerFamily(Family family) {
-    List<Entity> entitiesInFamily = _immutableFamilies[family];
+  List<Entity?> _registerFamily(Family family) {
+    List<Entity?>? entitiesInFamily = _immutableFamilies[family];
 
     if (entitiesInFamily == null) {
-      List<Entity> familyEntities = List();
-      entitiesInFamily = unmodifiable(familyEntities);
+      List<Entity?> familyEntities = [];
+      entitiesInFamily = List.unmodifiable(familyEntities);
       _families[family] = familyEntities;
       _immutableFamilies[family] = entitiesInFamily;
       _entityListenerMasks[family] = Bits();
 
-      for (Entity entity in entities) {
+      for (Entity? entity in entities!) {
         updateFamilyMembership(entity);
       }
     }
 
-    return unmodifiable(entitiesInFamily);
+    return List.unmodifiable(entitiesInFamily);
   }
 }

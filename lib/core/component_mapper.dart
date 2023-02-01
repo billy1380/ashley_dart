@@ -23,7 +23,7 @@ import 'package:ashley_dart/core/entity.dart';
  * @param <T> the class type of the {@link Component}.
  * @author David Saltares
  */
-class ComponentMapper<T extends Component> {
+class ComponentMapper<T extends Component?> {
   final ComponentType componentType;
 
   /**
@@ -35,8 +35,8 @@ class ComponentMapper<T extends Component> {
   }
 
   /** @return The {@link Component} of the specified class belonging to entity. */
-  T operator [](Entity entity) {
-    return entity[componentType];
+  T? operator [](Entity entity) {
+    return entity[componentType] as T?;
   }
 
   /** @return Whether or not entity has the component of the specified class. */

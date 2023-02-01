@@ -84,7 +84,7 @@ class Bits {
 
   void _checkCapacity(int len) {
     if (len >= bits.length) {
-      List<int> newBits = List(len + 1);
+      List<int> newBits = List.filled(len + 1, 0);
 
       for (int i = 0; i < bits.length; i++) {
         newBits[i] = bits[i];
@@ -97,7 +97,7 @@ class Bits {
 	@param index the index of the bit to clear
 	 * @throws ArrayIndexOutOfBoundsException if index < 0 */
 
-  void clear([int index]) {
+  void clear([int? index]) {
     if (index != null) {
       final int word = _unsignedShift(index, 6);
       if (word >= bits.length) return;

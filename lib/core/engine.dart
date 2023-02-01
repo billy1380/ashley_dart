@@ -28,13 +28,13 @@ import 'package:ashley_dart/signals/signal.dart';
 import 'package:ashley_dart/utils/constructor_pool.dart';
 
 class _ComponentListener implements Listener<Entity> {
-  final FamilyManager _familyManager;
+  final FamilyManager? _familyManager;
 
   const _ComponentListener(this._familyManager);
 
   @override
   void receive(Signal<Entity> signal, Entity object) {
-    _familyManager.updateFamilyMembership(object);
+    _familyManager!.updateFamilyMembership(object);
   }
 }
 
@@ -60,13 +60,13 @@ class _EngineEntityListener implements EntityListener {
   const _EngineEntityListener(this._engine);
 
   @override
-  void entityAdded(Entity entity) {
-    _engine.addEntityInternal(entity);
+  void entityAdded(Entity? entity) {
+    _engine.addEntityInternal(entity!);
   }
 
   @override
-  void entityRemoved(Entity entity) {
-    _engine.removeEntityInternal(entity);
+  void entityRemoved(Entity? entity) {
+    _engine.removeEntityInternal(entity!);
   }
 }
 
@@ -105,13 +105,13 @@ class Engine {
 
   final Map<Type, Constructor> constructors = {};
 
-  Listener<Entity> _componentAdded;
-  Listener<Entity> _componentRemoved;
+  Listener<Entity>? _componentAdded;
+  Listener<Entity>? _componentRemoved;
 
-  SystemManager _systemManager;
-  EntityManager _entityManager;
-  ComponentOperationHandler _componentOperationHandler;
-  FamilyManager _familyManager;
+  late SystemManager _systemManager;
+  late EntityManager _entityManager;
+  ComponentOperationHandler? _componentOperationHandler;
+  FamilyManager? _familyManager;
   bool _updating = false;
 
   Engine() {
@@ -142,8 +142,8 @@ class Engine {
   /**
 	 * Creates a new {@link Component}. To use that method your components must have a visible no-arg constructor
 	 */
-  T createComponent<T extends Component>(Type componentType) {
-    return constructors[componentType]();
+  T? createComponent<T extends Component>(Type componentType) {
+    return constructors[componentType]!();
   }
 
   /**
@@ -152,27 +152,27 @@ class Engine {
 	 * was already registered with an engine.
 	 */
   void addEntity(Entity entity) {
-    bool delayed = _updating || _familyManager.notifying;
+    bool delayed = _updating || _familyManager!.notifying;
     _entityManager.addEntity(entity, delayed);
   }
 
   /**
 	 * Removes an entity from this Engine.
 	 */
-  void removeEntity(Entity entity) {
-    bool delayed = _updating || _familyManager.notifying;
+  void removeEntity(Entity? entity) {
+    bool delayed = _updating || _familyManager!.notifying;
     _entityManager.removeEntity(entity, delayed);
   }
 
   /**
 	 * Removes all entities of the given {@link Family}.
 	 */
-  void removeAllEntities([Family family]) {
+  void removeAllEntities([Family? family]) {
     if (family == null) {
-      bool delayed = _updating || _familyManager.notifying;
+      bool delayed = _updating || _familyManager!.notifying;
       _entityManager.removeAllEntities(null, delayed);
     } else {
-      bool delayed = _updating || _familyManager.notifying;
+      bool delayed = _updating || _familyManager!.notifying;
       _entityManager.removeAllEntities(this[family], delayed);
     }
   }
@@ -200,7 +200,7 @@ class Engine {
 	 * @return An unmodifiable array of entities that will match the state of the entities in the
 	 *  engine.
 	 */
-  List<Entity> get entities {
+  List<Entity?>? get entities {
     return _entityManager.entities;
   }
 
@@ -231,22 +231,22 @@ class Engine {
 	 * Quick {@link EntitySystem} retrieval.
 	 */
 
-  T getSystem<T extends EntitySystem>(Type systemType) {
+  T? getSystem<T extends EntitySystem>(Type systemType) {
     return _systemManager.getSystem(systemType);
   }
 
   /**
 	 * @return immutable array of all entity systems managed by the {@link Engine}.
 	 */
-  List<EntitySystem> getSystems() {
-    return _systemManager.getSystems();
+  List<EntitySystem>? get systems {
+    return _systemManager.systems;
   }
 
   /**
 	 * Returns immutable collection of entities for the specified {@link Family}. Will return the same instance every time.
 	 */
-  List<Entity> operator [](Family family) {
-    return _familyManager[family];
+  List<Entity?> operator [](Family family) {
+    return _familyManager![family];
   }
 
   /**
@@ -255,16 +255,16 @@ class Engine {
 	 * value means it will get executed first.
 	 */
   void addEntityListener(
-      [Family family, int priority = 0, EntityListener listener]) {
-    _familyManager.addEntityListener(
-        family ?? Engine._empty, priority, listener);
+      [Family? family, int priority = 0, EntityListener? listener]) {
+    _familyManager!
+        .addEntityListener(family ?? Engine._empty, priority, listener);
   }
 
   /**
 	 * Removes an {@link EntityListener}
 	 */
   void removeEntityListener(EntityListener listener) {
-    _familyManager.removeEntityListener(listener);
+    _familyManager!.removeEntityListener(listener);
   }
 
   /**
@@ -278,18 +278,18 @@ class Engine {
     }
 
     _updating = true;
-    List<EntitySystem> systems = _systemManager.getSystems();
+    List<EntitySystem> systems = _systemManager.systems!;
     try {
       for (int i = 0; i < systems.length; ++i) {
         EntitySystem system = systems[i];
 
-        if (system.processing) {
+        if (system.processing!) {
           system.update(deltaTime);
         }
 
-        while (_componentOperationHandler.hasOperationsToProcess ||
+        while (_componentOperationHandler!.hasOperationsToProcess ||
             _entityManager.hasPendingOperations) {
-          _componentOperationHandler.processOperations();
+          _componentOperationHandler!.processOperations();
           _entityManager.processPendingOperations();
         }
       }
@@ -303,11 +303,11 @@ class Engine {
     entity.componentRemoved.add(_componentRemoved);
     entity.componentOperationHandler = _componentOperationHandler;
 
-    _familyManager.updateFamilyMembership(entity);
+    _familyManager!.updateFamilyMembership(entity);
   }
 
   void removeEntityInternal(Entity entity) {
-    _familyManager.updateFamilyMembership(entity);
+    _familyManager!.updateFamilyMembership(entity);
 
     entity.componentAdded.remove(_componentAdded);
     entity.componentRemoved.remove(_componentRemoved);

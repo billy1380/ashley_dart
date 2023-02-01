@@ -18,15 +18,15 @@ import 'package:ashley_dart/ashley_dart.dart';
 import 'package:ashley_dart/utils/constructor_pool.dart';
 
 class PooledEntity extends Entity implements Poolable {
-  final ComponentPools _componentPools;
+  final ComponentPools? _componentPools;
 
   PooledEntity(this._componentPools);
 
   @override
-  Component removeInternal(Type componentClass) {
-    Component removed = super.removeInternal(componentClass);
+  Component? removeInternal(Type componentClass) {
+    Component? removed = super.removeInternal(componentClass);
     if (removed != null) {
-      _componentPools.free(removed);
+      _componentPools!.free(removed);
     }
 
     return removed;
@@ -44,7 +44,7 @@ class PooledEntity extends Entity implements Poolable {
 }
 
 class EntityPool extends Pool<PooledEntity> {
-  final ComponentPools _componentPools;
+  final ComponentPools? _componentPools;
   EntityPool(this._componentPools, int initialSize, int maxSize)
       : super(initialSize, maxSize);
 
@@ -62,23 +62,19 @@ class ComponentPools {
 
   ComponentPools(this._constructors, this._initialSize, this._maxSize);
 
-  T obtain<T>(Type type) {
-    ConstructorPool pool = _pools[type];
+  T? obtain<T>(Type type) {
+    ConstructorPool? pool = _pools[type];
 
     if (pool == null) {
       pool = ConstructorPool(type, _constructors[type], _initialSize, _maxSize);
       _pools[type] = pool;
     }
 
-    return pool.obtain() as T;
+    return pool.obtain() as T?;
   }
 
   void free(Object object) {
-    if (object == null) {
-      throw Exception("object cannot be null.");
-    }
-
-    ConstructorPool pool = _pools[object.runtimeType];
+    ConstructorPool? pool = _pools[object.runtimeType];
 
     if (pool == null) {
       return; // Ignore freeing an object that was never retained.
@@ -88,11 +84,8 @@ class ComponentPools {
   }
 
   void freeAll(List objects) {
-    if (objects == null) throw Exception("objects cannot be null.");
-
     for (int i = 0, n = objects.length; i < n; i++) {
       Object object = objects[i];
-      if (object == null) continue;
       free(object);
     }
   }
@@ -115,8 +108,8 @@ class ComponentPools {
  * @author David Saltares
  */
 class PooledEngine extends Engine {
-  EntityPool _entityPool;
-  ComponentPools _componentPools;
+  late EntityPool _entityPool;
+  ComponentPools? _componentPools;
 
   /**
 	 * Creates PooledEngine with the specified pools size configurations.
@@ -149,8 +142,8 @@ class PooledEngine extends Engine {
 	 * Overrides the default implementation of Engine (creating a Object)
 	 */
   @override
-  T createComponent<T extends Component>(Type componentType) {
-    return _componentPools.obtain<T>(componentType);
+  T? createComponent<T extends Component>(Type componentType) {
+    return _componentPools!.obtain<T>(componentType);
   }
 
   /**
@@ -159,7 +152,7 @@ class PooledEngine extends Engine {
 	 */
   void clearPools() {
     _entityPool.clear();
-    _componentPools.clear();
+    _componentPools!.clear();
   }
 
   @override

@@ -34,14 +34,14 @@ class TestSystemA extends IteratingSystem {
   TestSystemA(String name) : super(Family.all([ComponentA]).get());
 
   @override
-  void processEntity(Entity e, double d) {}
+  void processEntity(Entity? e, double d) {}
 }
 
 class TestSystemB extends IteratingSystem {
   TestSystemB(String name) : super(Family.all([ComponentB]).get());
 
   @override
-  void processEntity(Entity e, double d) {}
+  void processEntity(Entity? e, double d) {}
 }
 
 void main() {
