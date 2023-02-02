@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import '../helpers.dart';
 import 'package:ashley_dart/ashley_dart.dart';
 import 'package:test/test.dart';
@@ -38,7 +40,7 @@ void main() {
 class FamilyManagerTests {
   void entitiesForFamily() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = List.unmodifiable(entities);
+    List<Entity> immutableEntities = UnmodifiableListView(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Family family = Family.all([ComponentA, ComponentB]).get();
@@ -84,7 +86,7 @@ class FamilyManagerTests {
 
   void entityForFamilyWithRemoval() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = List.unmodifiable(entities);
+    List<Entity> immutableEntities = UnmodifiableListView(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Entity entity = Entity();
@@ -94,8 +96,7 @@ class FamilyManagerTests {
 
     manager.updateFamilyMembership(entity);
 
-    List<Entity?> familyEntities =
-        manager[Family.all([ComponentA]).get()];
+    List<Entity?> familyEntities = manager[Family.all([ComponentA]).get()];
 
     assertEquals(1, familyEntities.length);
     assertTrue(familyEntities.contains(entity));
@@ -112,7 +113,7 @@ class FamilyManagerTests {
 
   void entitiesForFamilyAfter() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = List.unmodifiable(entities);
+    List<Entity> immutableEntities = UnmodifiableListView(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Family family = Family.all([ComponentA, ComponentB]).get();
@@ -158,7 +159,7 @@ class FamilyManagerTests {
 
   void entitiesForFamilyWithRemoval() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = List.unmodifiable(entities);
+    List<Entity> immutableEntities = UnmodifiableListView(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     Family family = Family.all([ComponentA, ComponentB]).get();
@@ -217,11 +218,11 @@ class FamilyManagerTests {
 
   void entitiesForFamilyWithRemovalAndFiltering() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = List.unmodifiable(entities);
+    List<Entity> immutableEntities = UnmodifiableListView(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
-    List<Entity?> entitiesWithComponentAOnly = manager
-        [Family.all([ComponentA]).exclude([ComponentB]).get()];
+    List<Entity?> entitiesWithComponentAOnly =
+        manager[Family.all([ComponentA]).exclude([ComponentB]).get()];
 
     List<Entity?> entitiesWithComponentB =
         manager[Family.all([ComponentB]).get()];
@@ -253,7 +254,7 @@ class FamilyManagerTests {
 
   void entityListenerThrows() {
     List<Entity> entities = [];
-    List<Entity> immutableEntities = List.unmodifiable(entities);
+    List<Entity> immutableEntities = UnmodifiableListView(entities);
     FamilyManager manager = FamilyManager(immutableEntities);
 
     EntityListener listener = ThrowingListener();

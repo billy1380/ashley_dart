@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:ashley_dart/core/component.dart';
 import 'package:ashley_dart/core/component_operation_handler.dart';
 import 'package:ashley_dart/core/component_type.dart';
@@ -16,7 +18,6 @@ import 'package:ashley_dart/core/component_type.dart';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-
 import 'package:ashley_dart/signals/signal.dart';
 import 'package:ashley_dart/utils/bag.dart';
 import 'package:ashley_dart/utils/bits.dart';
@@ -49,7 +50,7 @@ class Entity {
         componentRemoved = Signal<Entity>() {
     _components = Bag<Component?>();
     _componentsArray = [];
-    _immutableComponentsArray = List.unmodifiable(_componentsArray!);
+    _immutableComponentsArray = UnmodifiableListView(_componentsArray!);
     _componentBits = Bits();
     _familyBits = Bits();
     flags = 0;

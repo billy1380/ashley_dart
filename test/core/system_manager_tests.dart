@@ -1,6 +1,7 @@
-import '../helpers.dart';
 import 'package:ashley_dart/ashley_dart.dart';
 import 'package:test/test.dart';
+
+import '../helpers.dart';
 
 class SystemListenerSpy implements SystemListener {
   int addedCount = 0;

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:ashley_dart/core/entity.dart';
 import 'package:ashley_dart/core/entity_listener.dart';
 import 'package:ashley_dart/utils/pool.dart';
@@ -30,12 +32,12 @@ class EntityManager {
   EntityListener _listener;
   List<Entity?> _entities = [];
   Set<Entity?> _entitySet = <Entity?>{};
-  List<Entity?>? _immutableEntities;
+  late List<Entity?> _immutableEntities;
   List<_EntityOperation> _pendingOperations = [];
   _EntityOperationPool _entityOperationPool = _EntityOperationPool();
 
   EntityManager(this._listener) {
-    _immutableEntities = List.unmodifiable(_entities);
+    _immutableEntities = UnmodifiableListView(_entities);
   }
 
   void addEntity(Entity entity, [bool delayed = false]) {
@@ -70,7 +72,7 @@ class EntityManager {
     }
 
     if (delayed) {
-      for (Entity? entity in entities!) {
+      for (Entity? entity in entities) {
         entity!.scheduledForRemoval = true;
       }
       _EntityOperation operation = _entityOperationPool.obtain();
@@ -78,7 +80,7 @@ class EntityManager {
       operation.entities = entities;
       _pendingOperations.add(operation);
     } else {
-      while (entities!.isNotEmpty) {
+      while (entities.isNotEmpty) {
         removeEntity(entities.first, false);
       }
     }

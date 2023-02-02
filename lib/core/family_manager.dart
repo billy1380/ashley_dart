@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:ashley_dart/core/entity.dart';
 import 'package:ashley_dart/core/entity_listener.dart';
 import 'package:ashley_dart/core/family.dart';
@@ -148,7 +150,7 @@ class FamilyManager {
 
     if (entitiesInFamily == null) {
       List<Entity?> familyEntities = [];
-      entitiesInFamily = List.unmodifiable(familyEntities);
+      entitiesInFamily = UnmodifiableListView(familyEntities);
       _families[family] = familyEntities;
       _immutableFamilies[family] = entitiesInFamily;
       _entityListenerMasks[family] = Bits();
@@ -158,6 +160,6 @@ class FamilyManager {
       }
     }
 
-    return List.unmodifiable(entitiesInFamily);
+    return UnmodifiableListView(entitiesInFamily);
   }
 }

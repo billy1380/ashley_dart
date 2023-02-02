@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:ashley_dart/core/entity_system.dart';
 
 typedef _SystemComparator = int Function(EntitySystem a, EntitySystem b);
@@ -21,7 +23,7 @@ class SystemManager {
   SystemListener _listener;
 
   SystemManager(this._listener) {
-    _immutableSystems = List.unmodifiable(_systems);
+    _immutableSystems = UnmodifiableListView(_systems);
   }
 
   void addSystem(EntitySystem system) {

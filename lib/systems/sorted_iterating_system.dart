@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:ashley_dart/core/engine.dart';
 import 'package:ashley_dart/core/entity.dart';
 import 'package:ashley_dart/core/entity_listener.dart';
@@ -31,7 +33,7 @@ abstract class SortedIteratingSystem extends EntitySystem
     implements EntityListener {
   Family _family;
   List<Entity?> _sortedEntities = [];
-  List<Entity>? _entities;
+  late List<Entity?> _entities;
   late bool _shouldSort;
   Comparator<Entity?> _comparator;
 
@@ -43,7 +45,7 @@ abstract class SortedIteratingSystem extends EntitySystem
 	 */
   SortedIteratingSystem(this._family, this._comparator, [int priority = 0])
       : super(priority) {
-    _entities = List.unmodifiable(_sortedEntities);
+    _entities = UnmodifiableListView(_sortedEntities);
   }
 
   /**
