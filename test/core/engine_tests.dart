@@ -33,13 +33,13 @@ class EntityListenerMock implements EntityListener {
   int removedCount = 0;
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     ++addedCount;
     assertNotNull(entity);
   }
 
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     ++removedCount;
     assertNotNull(entity);
   }
@@ -47,10 +47,10 @@ class EntityListenerMock implements EntityListener {
 
 class AddComponentBEntityListenerMock extends EntityListenerMock {
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     super.entityAdded(entity);
 
-    entity.add(ComponentB());
+    entity!.add(ComponentB());
   }
 }
 
@@ -59,7 +59,7 @@ class EntitySystemMock extends EntitySystem {
   int addedCalls = 0;
   int removedCalls = 0;
 
-  /* private*/ List<int> updates;
+  /* private*/ List<int>? updates;
 
   EntitySystemMock([this.updates]);
 
@@ -68,19 +68,19 @@ class EntitySystemMock extends EntitySystem {
     ++updateCalls;
 
     if (updates != null) {
-      updates.add(priority);
+      updates!.add(priority);
     }
   }
 
   @override
-  void addedToEngine(Engine engine) {
+  void addedToEngine(Engine? engine) {
     ++addedCalls;
 
     assertNotNull(engine);
   }
 
   @override
-  void removedFromEngine(Engine engine) {
+  void removedFromEngine(Engine? engine) {
     ++removedCalls;
 
     assertNotNull(engine);
@@ -88,11 +88,11 @@ class EntitySystemMock extends EntitySystem {
 }
 
 class EntitySystemMockA extends EntitySystemMock {
-  EntitySystemMockA([List<int> updates]) : super(updates);
+  EntitySystemMockA([List<int>? updates]) : super(updates);
 }
 
 class EntitySystemMockB extends EntitySystemMock {
-  EntitySystemMockB([List<int> updates]) : super(updates);
+  EntitySystemMockB([List<int>? updates]) : super(updates);
 }
 
 class CounterComponent implements Component {
@@ -100,20 +100,22 @@ class CounterComponent implements Component {
 }
 
 class CounterSystem extends EntitySystem {
-  /* private*/ List<Entity> entities;
+  /* private*/ late List<Entity?> entities;
 
   @override
-  void addedToEngine(Engine engine) {
-    entities = engine[Family.all([CounterComponent]).get()];
+  void addedToEngine(Engine? engine) {
+    entities = engine![Family.all([CounterComponent]).get()];
   }
 
   @override
   void update(double deltaTime) {
     for (int i = 0; i < entities.length; ++i) {
       if (i % 2 == 0) {
-        entities[i].getComponent<CounterComponent>(CounterComponent).counter++;
+        entities[i]!
+            .getComponent<CounterComponent>(CounterComponent)!
+            .counter++;
       } else {
-        engine.removeEntity(entities[i]);
+        engine!.removeEntity(entities[i]);
       }
     }
   }
@@ -125,8 +127,8 @@ class ComponentAddSystem extends IteratingSystem {
   ComponentAddSystem(this._listener) : super(Family.all([]).get());
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
-    assertNull(entity.getComponent(ComponentA));
+  void processEntity(Entity? entity, double deltaTime) {
+    assertNull(entity!.getComponent(ComponentA));
     entity.add(ComponentA());
     assertNotNull(entity.getComponent(ComponentA));
     _listener.checkEntityListenerUpdate();
@@ -139,8 +141,8 @@ class ComponentRemoveSystem extends IteratingSystem {
   ComponentRemoveSystem(this._listener) : super(Family.all([]).get());
 
   @override
-  void processEntity(Entity entity, double deltaTime) {
-    assertNotNull(entity.getComponent(ComponentA));
+  void processEntity(Entity? entity, double deltaTime) {
+    assertNotNull(entity!.getComponent(ComponentA));
     entity.remove(ComponentA);
     assertNull(entity.getComponent(ComponentA));
     _listener.checkEntityListenerUpdate();
@@ -154,12 +156,12 @@ class ComponentAddedListener implements EntityListener {
   ComponentAddedListener(this.numEntities);
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     addedCalls++;
   }
 
   @override
-  void entityRemoved(Entity entity) {}
+  void entityRemoved(Entity? entity) {}
 
   void checkEntityListenerNonUpdate() {
     assertEquals(numEntities, addedCalls);
@@ -178,10 +180,10 @@ class ComponentRemovedListener implements EntityListener {
   ComponentRemovedListener(this.numEntities);
 
   @override
-  void entityAdded(Entity entity) {}
+  void entityAdded(Entity? entity) {}
 
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     removedCalls++;
   }
 
@@ -203,12 +205,12 @@ class CascadeOperationsInListenersWhileUpdatingEntityListener1
   const CascadeOperationsInListenersWhileUpdatingEntityListener1(
       this._engine, this._entities, this._numEntities);
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     _engine.removeEntity(entity);
   }
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     if (_entities.length < _numEntities) {
       Entity e = Entity();
       _engine.addEntity(e);
@@ -218,22 +220,22 @@ class CascadeOperationsInListenersWhileUpdatingEntityListener1
 
 class CascadeOperationsInListenersWhileUpdatingEntityListener2
     implements EntityListener {
-  final List<Entity> _entities;
+  final List<Entity?> _entities;
 
   const CascadeOperationsInListenersWhileUpdatingEntityListener2(
       this._entities);
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     _entities.remove(entity);
-    if (_entities.length > 0) {
-      _entities.first.remove(ComponentA);
+    if (_entities.isNotEmpty) {
+      _entities.first!.remove(ComponentA);
     }
   }
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     _entities.add(entity);
-    entity.add(ComponentA());
+    entity!.add(ComponentA());
   }
 }
 
@@ -241,7 +243,7 @@ class CascadeOperationsInListenersWhileUpdatingEntitySystem1
     extends EntitySystem {
   @override
   void update(double deltaTime) {
-    engine.addEntity(Entity());
+    engine!.addEntity(Entity());
   }
 }
 
@@ -252,7 +254,7 @@ class CascadeOperationsInListenersWhileUpdatingEntitySystem2
   CascadeOperationsInListenersWhileUpdatingEntitySystem2(this._entities);
   @override
   void update(double deltaTime) {
-    engine.removeEntity(_entities.first);
+    engine!.removeEntity(_entities.first);
   }
 }
 
@@ -263,7 +265,7 @@ class NestedUpdateExceptionEntitySystem extends EntitySystem {
   void update(double deltaTime) {
     if (!duringCallback) {
       duringCallback = true;
-      engine.update(deltaTime);
+      engine!.update(deltaTime);
       duringCallback = false;
     }
   }
@@ -401,12 +403,12 @@ class EngineTests {
     EntitySystemMockA systemA = EntitySystemMockA();
     EntitySystemMockB systemB = EntitySystemMockB();
 
-    assertEquals(0, engine.getSystems().length);
+    assertEquals(0, engine.systems!.length);
 
     engine.addSystem(systemA);
     engine.addSystem(systemB);
 
-    assertEquals(2, engine.getSystems().length);
+    assertEquals(2, engine.systems!.length);
   }
 
   void addTwoSystemsOfSameClass() {
@@ -414,16 +416,16 @@ class EngineTests {
     EntitySystemMockA system1 = EntitySystemMockA();
     EntitySystemMockA system2 = EntitySystemMockA();
 
-    assertEquals(0, engine.getSystems().length);
+    assertEquals(0, engine.systems!.length);
 
     engine.addSystem(system1);
 
-    assertEquals(1, engine.getSystems().length);
+    assertEquals(1, engine.systems!.length);
     assertEquals(system1, engine.getSystem(EntitySystemMockA));
 
     engine.addSystem(system2);
 
-    assertEquals(1, engine.getSystems().length);
+    assertEquals(1, engine.systems!.length);
     assertEquals(system2, engine.getSystem(EntitySystemMockA));
   }
 
@@ -513,7 +515,7 @@ class EngineTests {
     Engine engine = Engine();
 
     Family family = Family.all([ComponentA, ComponentB]).get();
-    List<Entity> familyEntities = engine[family];
+    List<Entity?> familyEntities = engine[family];
 
     assertEquals(0, familyEntities.length);
 
@@ -557,7 +559,7 @@ class EngineTests {
 
     engine.addEntity(entity);
 
-    List<Entity> entities = engine[Family.all([ComponentA]).get()];
+    List<Entity?> entities = engine[Family.all([ComponentA]).get()];
 
     assertEquals(1, entities.length);
     assertTrue(entities.contains(entity));
@@ -572,7 +574,7 @@ class EngineTests {
     Engine engine = Engine();
 
     Family family = Family.all([ComponentA, ComponentB]).get();
-    List<Entity> familyEntities = engine[family];
+    List<Entity?> familyEntities = engine[family];
 
     assertEquals(0, familyEntities.length);
 
@@ -611,7 +613,7 @@ class EngineTests {
     Engine engine = Engine();
 
     Family family = Family.all([ComponentA, ComponentB]).get();
-    List<Entity> familyEntities = engine[family];
+    List<Entity?> familyEntities = engine[family];
 
     Entity entity1 = Entity();
     Entity entity2 = Entity();
@@ -656,10 +658,10 @@ class EngineTests {
   void entitiesForFamilyWithRemovalAndFiltering() {
     Engine engine = Engine();
 
-    List<Entity> entitiesWithComponentAOnly =
+    List<Entity?> entitiesWithComponentAOnly =
         engine[Family.all([ComponentA]).exclude([ComponentB]).get()];
 
-    List<Entity> entitiesWithComponentB =
+    List<Entity?> entitiesWithComponentB =
         engine[Family.all([ComponentB]).get()];
 
     Entity entity1 = Entity();
@@ -693,18 +695,24 @@ class EngineTests {
       engine.addEntity(entity);
     }
 
-    List<Entity> entities = engine[Family.all([CounterComponent]).get()];
+    List<Entity?> entities = engine[Family.all([CounterComponent]).get()];
 
     for (int i = 0; i < entities.length; ++i) {
-      assertEquals(0,
-          entities[i].getComponent<CounterComponent>(CounterComponent).counter);
+      assertEquals(
+          0,
+          entities[i]!
+              .getComponent<CounterComponent>(CounterComponent)!
+              .counter);
     }
 
     engine.update(deltaTime);
 
     for (int i = 0; i < entities.length; ++i) {
-      assertEquals(1,
-          entities[i].getComponent<CounterComponent>(CounterComponent).counter);
+      assertEquals(
+          1,
+          entities[i]!
+              .getComponent<CounterComponent>(CounterComponent)!
+              .counter);
     }
   }
 
@@ -895,7 +903,7 @@ class EngineTests {
 
     Engine engine = Engine();
 
-    List<Entity> entities = List<Entity>();
+    List<Entity> entities = [];
 
     for (int i = 0; i < numEntities; ++i) {
       Entity entity = Entity();
@@ -903,7 +911,7 @@ class EngineTests {
       engine.addEntity(entity);
     }
 
-    List<Entity> engineEntities = engine.entities;
+    List<Entity?> engineEntities = engine.entities!;
 
     assertEquals(entities.length, engineEntities.length);
 

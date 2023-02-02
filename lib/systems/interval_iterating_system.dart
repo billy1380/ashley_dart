@@ -26,7 +26,7 @@ import 'package:ashley_dart/systems/interval_system.dart';
  */
 abstract class IntervalIteratingSystem extends IntervalSystem {
   Family _family;
-  List<Entity> _entities;
+  List<Entity?>? _entities;
 
   /**
 	 * @param family represents the collection of family the system should process
@@ -37,21 +37,21 @@ abstract class IntervalIteratingSystem extends IntervalSystem {
       : super(interval, priority);
 
   @override
-  void addedToEngine(Engine engine) {
-    _entities = engine[_family];
+  void addedToEngine(Engine? engine) {
+    _entities = engine![_family];
   }
 
   @override
   void updateInterval() {
-    for (int i = 0; i < _entities.length; ++i) {
-      processEntity(_entities[i]);
+    for (int i = 0; i < _entities!.length; ++i) {
+      processEntity(_entities![i]);
     }
   }
 
   /**
 	 * @return set of entities processed by the system
 	 */
-  List<Entity> get entities {
+  List<Entity?>? get entities {
     return _entities;
   }
 
@@ -66,5 +66,5 @@ abstract class IntervalIteratingSystem extends IntervalSystem {
 	 * The user should place the entity processing logic here.
 	 * @param entity
 	 */
-  void processEntity(Entity entity);
+  void processEntity(Entity? entity);
 }

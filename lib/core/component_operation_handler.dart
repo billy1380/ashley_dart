@@ -18,8 +18,8 @@ enum ComponentOperationType {
 }
 
 class _ComponentOperation implements Poolable {
-  ComponentOperationType type;
-  Entity entity;
+  ComponentOperationType? type;
+  Entity? entity;
 
   void makeAdd(Entity entity) {
     this.type = ComponentOperationType.Add;
@@ -65,7 +65,7 @@ class ComponentOperationHandler {
   }
 
   bool get hasOperationsToProcess {
-    return _operations.length > 0;
+    return _operations.isNotEmpty;
   }
 
   void processOperations() {
@@ -74,10 +74,10 @@ class ComponentOperationHandler {
 
       switch (operation.type) {
         case ComponentOperationType.Add:
-          operation.entity.notifyComponentAdded();
+          operation.entity!.notifyComponentAdded();
           break;
         case ComponentOperationType.Remove:
-          operation.entity.notifyComponentRemoved();
+          operation.entity!.notifyComponentRemoved();
           break;
         default:
           break;

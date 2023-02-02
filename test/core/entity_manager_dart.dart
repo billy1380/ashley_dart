@@ -7,13 +7,13 @@ class EntityListenerMock implements EntityListener {
   int removedCount = 0;
 
   @override
-  void entityAdded(Entity entity) {
+  void entityAdded(Entity? entity) {
     ++addedCount;
     assertNotNull(entity);
   }
 
   @override
-  void entityRemoved(Entity entity) {
+  void entityRemoved(Entity? entity) {
     ++removedCount;
     assertNotNull(entity);
   }
@@ -60,7 +60,7 @@ class EntityManagerTests {
     EntityListenerMock listener = EntityListenerMock();
     EntityManager manager = EntityManager(listener);
 
-    List<Entity> entities = List<Entity>();
+    List<Entity> entities = [];
 
     for (int i = 0; i < numEntities; ++i) {
       Entity entity = Entity();
@@ -68,7 +68,7 @@ class EntityManagerTests {
       manager.addEntity(entity);
     }
 
-    List<Entity> engineEntities = manager.entities;
+    List<Entity?> engineEntities = manager.entities!;
 
     assertEquals(entities.length, engineEntities.length);
 
@@ -124,7 +124,7 @@ class EntityManagerTests {
     manager.addEntity(entityA);
     manager.addEntity(entityB);
 
-    assertEquals(2, manager.entities.length);
+    assertEquals(2, manager.entities!.length);
 
     Entity entityC = Entity();
     Entity entityD = Entity();
@@ -133,9 +133,9 @@ class EntityManagerTests {
     manager.addEntity(entityD, delayed);
     manager.processPendingOperations();
 
-    assertEquals(2, manager.entities.length);
-    assertNotEquals(-1, manager.entities.indexOf(entityC));
-    assertNotEquals(-1, manager.entities.indexOf(entityD));
+    assertEquals(2, manager.entities!.length);
+    assertNotEquals(-1, manager.entities!.indexOf(entityC));
+    assertNotEquals(-1, manager.entities!.indexOf(entityD));
   }
 
   void removeAndAddEntityDelayed() {
@@ -144,16 +144,16 @@ class EntityManagerTests {
 
     Entity entity = Entity();
     manager.addEntity(entity, false); // immediate
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
 
     manager.removeEntity(entity, true); // delayed
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
 
     manager.addEntity(entity, true); // delayed
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
 
     manager.processPendingOperations();
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
   }
 
   void removeAllAndAddEntityDelayed() {
@@ -162,15 +162,15 @@ class EntityManagerTests {
 
     Entity entity = Entity();
     manager.addEntity(entity, false); // immediate
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
 
     manager.removeAllEntities(null, true); // delayed
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
 
     manager.addEntity(entity, true); // delayed
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
 
     manager.processPendingOperations();
-    assertEquals(1, manager.entities.length);
+    assertEquals(1, manager.entities!.length);
   }
 }

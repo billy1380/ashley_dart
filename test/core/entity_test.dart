@@ -60,14 +60,14 @@ class EntityTests {
     assertEquals(componentA, entity.addAndReturn(componentA));
     assertEquals(componentB, entity.addAndReturn(componentB));
 
-    assertEquals(2, entity.components.length);
+    assertEquals(2, entity.components!.length);
   }
 
   void noComponents() {
     Entity entity = Entity();
 
-    assertEquals(0, entity.components.length);
-    assertTrue(entity.componentBits.isEmpty);
+    assertEquals(0, entity.components!.length);
+    assertTrue(entity.componentBits!.isEmpty);
     assertNull(_am[entity]);
     assertNull(_bm[entity]);
     assertFalse(_am.has(entity));
@@ -79,9 +79,9 @@ class EntityTests {
 
     entity.add(ComponentA());
 
-    assertEquals(1, entity.components.length);
+    assertEquals(1, entity.components!.length);
 
-    Bits componentBits = entity.componentBits;
+    Bits componentBits = entity.componentBits!;
     int componentAIndex = ComponentType.getIndexFor(ComponentA);
 
     for (int i = 0; i < componentBits.length; ++i) {
@@ -95,7 +95,7 @@ class EntityTests {
 
     entity.remove(ComponentA);
 
-    assertEquals(0, entity.components.length);
+    assertEquals(0, entity.components!.length);
 
     for (int i = 0; i < componentBits.length; ++i) {
       assertFalse(componentBits[i]);
@@ -113,9 +113,9 @@ class EntityTests {
     entity.add(ComponentA());
     entity.add(ComponentB());
 
-    assertEquals(2, entity.components.length);
+    assertEquals(2, entity.components!.length);
 
-    Bits componentBits = entity.componentBits;
+    Bits componentBits = entity.componentBits!;
     int componentAIndex = ComponentType.getIndexFor(ComponentA);
     int componentBIndex = ComponentType.getIndexFor(ComponentB);
 
@@ -131,7 +131,7 @@ class EntityTests {
 
     entity.removeAll();
 
-    assertEquals(0, entity.components.length);
+    assertEquals(0, entity.components!.length);
 
     for (int i = 0; i < componentBits.length; ++i) {
       assertFalse(componentBits[i]);
@@ -152,7 +152,7 @@ class EntityTests {
     entity.add(a1);
     entity.add(a2);
 
-    assertEquals(1, entity.components.length);
+    assertEquals(1, entity.components!.length);
     assertTrue(_am.has(entity));
     assertNotEquals(a1, _am[entity]);
     assertEquals(a2, _am[entity]);
@@ -195,8 +195,8 @@ class EntityTests {
     Entity entity = Entity();
     entity.add(compA).add(compB);
 
-    ComponentA retA = entity.getComponent(ComponentA);
-    ComponentB retB = entity.getComponent(ComponentB);
+    ComponentA? retA = entity.getComponent(ComponentA);
+    ComponentB? retB = entity.getComponent(ComponentB);
 
     assertNotNull(retA);
     assertNotNull(retB);

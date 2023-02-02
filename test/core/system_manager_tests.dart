@@ -1,6 +1,7 @@
-import '../helpers.dart';
 import 'package:ashley_dart/ashley_dart.dart';
 import 'package:test/test.dart';
+
+import '../helpers.dart';
 
 class SystemListenerSpy implements SystemListener {
   int addedCount = 0;
@@ -23,34 +24,34 @@ class EntitySystemMock extends EntitySystem {
   int addedCalls = 0;
   int removedCalls = 0;
 
-  List<int> updates;
+  List<int>? updates;
 
   EntitySystemMock(this.updates);
 
   @override
   void update(double deltaTime) {
     if (updates != null) {
-      updates.add(priority);
+      updates!.add(priority);
     }
   }
 
   @override
-  void addedToEngine(Engine engine) {
+  void addedToEngine(Engine? engine) {
     ++addedCalls;
   }
 
   @override
-  void removedFromEngine(Engine engine) {
+  void removedFromEngine(Engine? engine) {
     ++removedCalls;
   }
 }
 
 class EntitySystemMockA extends EntitySystemMock {
-  EntitySystemMockA([List<int> updates]) : super(updates);
+  EntitySystemMockA([List<int>? updates]) : super(updates);
 }
 
 class EntitySystemMockB extends EntitySystemMock {
-  EntitySystemMockB([List<int> updates]) : super(updates);
+  EntitySystemMockB([List<int>? updates]) : super(updates);
 }
 
 void main() {
@@ -107,18 +108,18 @@ class SystemManagerTests {
     EntitySystemMockA systemA = EntitySystemMockA();
     EntitySystemMockB systemB = EntitySystemMockB();
 
-    assertEquals(0, manager.getSystems().length);
+    assertEquals(0, manager.systems!.length);
 
     manager.addSystem(systemA);
     manager.addSystem(systemB);
 
-    assertEquals(2, manager.getSystems().length);
+    assertEquals(2, manager.systems!.length);
     assertEquals(2, systemSpy.addedCount);
 
     manager.removeSystem(systemA);
     manager.removeSystem(systemB);
 
-    assertEquals(0, manager.getSystems().length);
+    assertEquals(0, manager.systems!.length);
     assertEquals(2, systemSpy.addedCount);
     assertEquals(2, systemSpy.removedCount);
   }
@@ -129,17 +130,17 @@ class SystemManagerTests {
     EntitySystemMockA system1 = EntitySystemMockA();
     EntitySystemMockA system2 = EntitySystemMockA();
 
-    assertEquals(0, manager.getSystems().length);
+    assertEquals(0, manager.systems!.length);
 
     manager.addSystem(system1);
 
-    assertEquals(1, manager.getSystems().length);
+    assertEquals(1, manager.systems!.length);
     assertEquals(system1, manager.getSystem(EntitySystemMockA));
     assertEquals(1, systemSpy.addedCount);
 
     manager.addSystem(system2);
 
-    assertEquals(1, manager.getSystems().length);
+    assertEquals(1, manager.systems!.length);
     assertEquals(system2, manager.getSystem(EntitySystemMockA));
     assertEquals(2, systemSpy.addedCount);
     assertEquals(1, systemSpy.removedCount);
@@ -159,7 +160,7 @@ class SystemManagerTests {
     manager.addSystem(system1);
     manager.addSystem(system2);
 
-    List<EntitySystem> systems = manager.getSystems();
+    List<EntitySystem> systems = manager.systems!;
     assertEquals(system2, systems[0]);
     assertEquals(system1, systems[1]);
   }

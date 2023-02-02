@@ -26,7 +26,7 @@ import 'package:ashley_dart/core/family.dart';
  */
 abstract class IteratingSystem extends EntitySystem {
   Family _family;
-  List<Entity> _entities;
+  List<Entity?>? _entities;
 
   /**
 	 * Instantiates a system that will iterate over the entities described by the Family, with a specific priority.
@@ -36,26 +36,26 @@ abstract class IteratingSystem extends EntitySystem {
   IteratingSystem(this._family, [int priority = 0]) : super(priority);
 
   @override
-  void addedToEngine(Engine engine) {
-    _entities = engine[_family];
+  void addedToEngine(Engine? engine) {
+    _entities = engine![_family];
   }
 
   @override
-  void removedFromEngine(Engine engine) {
+  void removedFromEngine(Engine? engine) {
     _entities = null;
   }
 
   @override
   void update(double deltaTime) {
-    for (int i = 0; i < _entities.length; ++i) {
-      processEntity(_entities[i], deltaTime);
+    for (int i = 0; i < _entities!.length; ++i) {
+      processEntity(_entities![i], deltaTime);
     }
   }
 
   /**
 	 * @return set of entities processed by the system
 	 */
-  List<Entity> get entities {
+  List<Entity?>? get entities {
     return _entities;
   }
 
@@ -72,5 +72,5 @@ abstract class IteratingSystem extends EntitySystem {
 	 * @param entity The current Entity being processed
 	 * @param deltaTime The delta time between the last and current frame
 	 */
-  void processEntity(Entity entity, double deltaTime);
+  void processEntity(Entity? entity, double deltaTime);
 }

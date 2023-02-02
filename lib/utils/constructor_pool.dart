@@ -16,13 +16,13 @@
 
 import 'package:ashley_dart/ashley_dart.dart';
 
-typedef Constructor<T> = T Function();
+typedef Constructor<T> = T? Function();
 
 /** Pool that creates new instances of a type using a passed constructor method. The type must have a zero argument constructor.
  * {@link Constructor#setAccessible(boolean)} will be used if the class and/or constructor is not visible.
  * @author Nathan Sweet */
-class ConstructorPool<T> extends Pool<T> {
-  final Constructor _constructor;
+class ConstructorPool<T> extends Pool<T?> {
+  final Constructor? _constructor;
 
   ConstructorPool(Type type, this._constructor,
       [int initialCapacity = 16, int max = INT_MAX, bool preFill = false])
@@ -32,9 +32,9 @@ class ConstructorPool<T> extends Pool<T> {
           "Class cannot be created (missing no-arg constructor): ${type.runtimeType}");
   }
 
-  T newObject() {
+  T? newObject() {
     try {
-      return _constructor() as T;
+      return _constructor!() as T?;
     } on Exception catch (ex) {
       throw Exception(
           "Unable to create new instance $_constructor with cause $ex");
