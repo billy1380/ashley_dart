@@ -1,22 +1,24 @@
-/*******************************************************************************
- * Copyright 2014 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+/// *****************************************************************************
+/// Copyright 2014 See AUTHORS file.
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///   http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///****************************************************************************
+library;
 
-import '../helpers.dart';
 import 'package:ashley_dart/ashley_dart.dart';
 import 'package:test/test.dart';
+
+import '../helpers.dart';
 
 const double deltaTime = 0.16;
 
@@ -59,16 +61,16 @@ class EntitySystemMock extends EntitySystem {
   int addedCalls = 0;
   int removedCalls = 0;
 
-  /* private*/ List<int>? updates;
+  final List<int>? _updates;
 
-  EntitySystemMock([this.updates]);
+  EntitySystemMock([this._updates]);
 
   @override
   void update(double deltaTime) {
     ++updateCalls;
 
-    if (updates != null) {
-      updates!.add(priority);
+    if (_updates != null) {
+      _updates!.add(priority);
     }
   }
 
@@ -88,11 +90,11 @@ class EntitySystemMock extends EntitySystem {
 }
 
 class EntitySystemMockA extends EntitySystemMock {
-  EntitySystemMockA([List<int>? updates]) : super(updates);
+  EntitySystemMockA([super.updates]);
 }
 
 class EntitySystemMockB extends EntitySystemMock {
-  EntitySystemMockB([List<int>? updates]) : super(updates);
+  EntitySystemMockB([super.updates]);
 }
 
 class CounterComponent implements Component {
@@ -100,7 +102,7 @@ class CounterComponent implements Component {
 }
 
 class CounterSystem extends EntitySystem {
-  /* private*/ late List<Entity?> entities;
+  late List<Entity?> entities;
 
   @override
   void addedToEngine(Engine? engine) {
@@ -122,7 +124,7 @@ class CounterSystem extends EntitySystem {
 }
 
 class ComponentAddSystem extends IteratingSystem {
-  ComponentAddedListener _listener;
+  final ComponentAddedListener _listener;
 
   ComponentAddSystem(this._listener) : super(Family.all([]).get());
 
@@ -136,7 +138,7 @@ class ComponentAddSystem extends IteratingSystem {
 }
 
 class ComponentRemoveSystem extends IteratingSystem {
-  ComponentRemovedListener _listener;
+  final ComponentRemovedListener _listener;
 
   ComponentRemoveSystem(this._listener) : super(Family.all([]).get());
 
@@ -274,7 +276,7 @@ class NestedUpdateExceptionEntitySystem extends EntitySystem {
 class SystemUpdateThrowsEntitySystem extends EntitySystem {
   @override
   void update(double deltaTime) {
-    throw new Exception("throwing");
+    throw Exception("throwing");
   }
 }
 
@@ -477,7 +479,7 @@ class EngineTests {
 
     engine.update(deltaTime);
 
-    int previous = INT_MIN;
+    int previous = intMin;
 
     for (int value in updates) {
       assertTrue(value >= previous);

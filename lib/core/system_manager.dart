@@ -2,28 +2,27 @@ import 'dart:collection';
 
 import 'package:ashley_dart/core/entity_system.dart';
 
-typedef _SystemComparator = int Function(EntitySystem a, EntitySystem b);
-
 abstract class SystemListener {
   void systemAdded(EntitySystem system);
   void systemRemoved(EntitySystem system);
 }
 
 class SystemManager {
-  _SystemComparator _systemComparator = (EntitySystem a, EntitySystem b) {
+  final List<EntitySystem> _systems = [];
+  List<EntitySystem>? _immutableSystems;
+  final Map<Type, EntitySystem> _systemsByClass = {};
+  final SystemListener _listener;
+
+  SystemManager(this._listener) {
+    _immutableSystems = UnmodifiableListView(_systems);
+  }
+
+  int _systemComparator(EntitySystem a, EntitySystem b) {
     return a.priority > b.priority
         ? 1
         : (a.priority == b.priority)
             ? 0
             : -1;
-  };
-  List<EntitySystem> _systems = [];
-  List<EntitySystem>? _immutableSystems;
-  Map<Type, EntitySystem> _systemsByClass = {};
-  SystemListener _listener;
-
-  SystemManager(this._listener) {
-    _immutableSystems = UnmodifiableListView(_systems);
   }
 
   void addSystem(EntitySystem system) {

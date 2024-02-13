@@ -47,11 +47,11 @@ class EntitySystemMock extends EntitySystem {
 }
 
 class EntitySystemMockA extends EntitySystemMock {
-  EntitySystemMockA([List<int>? updates]) : super(updates);
+  EntitySystemMockA([super.updates]);
 }
 
 class EntitySystemMockB extends EntitySystemMock {
-  EntitySystemMockB([List<int>? updates]) : super(updates);
+  EntitySystemMockB([super.updates]);
 }
 
 void main() {

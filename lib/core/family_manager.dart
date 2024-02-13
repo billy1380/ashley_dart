@@ -20,16 +20,14 @@ class _BitsPool extends Pool<Bits> {
 
 class FamilyManager {
   List<Entity?>? entities;
-  Map<Family, List<Entity?>> _families = {};
-  Map<Family, List<Entity?>> _immutableFamilies = {};
-  List<_EntityListenerData> _entityListeners = [];
-  Map<Family, Bits> _entityListenerMasks = {};
-  _BitsPool _bitsPool = _BitsPool();
+  final Map<Family, List<Entity?>> _families = {};
+  final Map<Family, List<Entity?>> _immutableFamilies = {};
+  final List<_EntityListenerData> _entityListeners = [];
+  final Map<Family, Bits> _entityListenerMasks = {};
+  final _BitsPool _bitsPool = _BitsPool();
   bool _notifying = false;
 
-  FamilyManager(List<Entity?>? entities) {
-    this.entities = entities;
-  }
+  FamilyManager(this.entities);
 
   List<Entity?> operator [](Family family) {
     return _registerFamily(family);

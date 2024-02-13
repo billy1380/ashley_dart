@@ -5,9 +5,9 @@ import 'package:ashley_dart/core/entity_listener.dart';
 import 'package:ashley_dart/utils/pool.dart';
 
 enum EntityOperationType {
-  Add,
-  Remove,
-  RemoveAll,
+  add,
+  remove,
+  removeAll,
 }
 
 class _EntityOperation implements Poolable {
@@ -23,18 +23,16 @@ class _EntityOperation implements Poolable {
 
 class _EntityOperationPool extends Pool<_EntityOperation> {
   @override
-  _EntityOperation newObject() {
-    return new _EntityOperation();
-  }
+  _EntityOperation newObject() => _EntityOperation();
 }
 
 class EntityManager {
-  EntityListener _listener;
-  List<Entity?> _entities = [];
-  Set<Entity?> _entitySet = <Entity?>{};
+  final EntityListener _listener;
+  final List<Entity?> _entities = [];
+  final Set<Entity?> _entitySet = <Entity?>{};
   late List<Entity?> _immutableEntities;
-  List<_EntityOperation> _pendingOperations = [];
-  _EntityOperationPool _entityOperationPool = _EntityOperationPool();
+  final List<_EntityOperation> _pendingOperations = [];
+  final _EntityOperationPool _entityOperationPool = _EntityOperationPool();
 
   EntityManager(this._listener) {
     _immutableEntities = UnmodifiableListView(_entities);
@@ -44,7 +42,7 @@ class EntityManager {
     if (delayed) {
       _EntityOperation operation = _entityOperationPool.obtain();
       operation.entity = entity;
-      operation.type = EntityOperationType.Add;
+      operation.type = EntityOperationType.add;
       _pendingOperations.add(operation);
     } else {
       addEntityInternal(entity);
@@ -59,7 +57,7 @@ class EntityManager {
       entity.scheduledForRemoval = true;
       _EntityOperation operation = _entityOperationPool.obtain();
       operation.entity = entity;
-      operation.type = EntityOperationType.Remove;
+      operation.type = EntityOperationType.remove;
       _pendingOperations.add(operation);
     } else {
       removeEntityInternal(entity);
@@ -67,16 +65,14 @@ class EntityManager {
   }
 
   void removeAllEntities([List<Entity?>? entities, bool delayed = false]) {
-    if (entities == null) {
-      entities = _immutableEntities;
-    }
+    entities ??= _immutableEntities;
 
     if (delayed) {
       for (Entity? entity in entities) {
         entity!.scheduledForRemoval = true;
       }
       _EntityOperation operation = _entityOperationPool.obtain();
-      operation.type = EntityOperationType.RemoveAll;
+      operation.type = EntityOperationType.removeAll;
       operation.entities = entities;
       _pendingOperations.add(operation);
     } else {
@@ -99,19 +95,19 @@ class EntityManager {
       _EntityOperation operation = _pendingOperations[i];
 
       switch (operation.type) {
-        case EntityOperationType.Add:
+        case EntityOperationType.add:
           addEntityInternal(operation.entity);
           break;
-        case EntityOperationType.Remove:
+        case EntityOperationType.remove:
           removeEntityInternal(operation.entity);
           break;
-        case EntityOperationType.RemoveAll:
+        case EntityOperationType.removeAll:
           while (operation.entities.isNotEmpty) {
             removeEntityInternal(operation.entities.first);
           }
           break;
         default:
-          throw new AssertionError("Unexpected EntityOperation type");
+          throw AssertionError("Unexpected EntityOperation type");
       }
 
       _entityOperationPool.free(operation);

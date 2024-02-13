@@ -13,12 +13,12 @@ class ComponentC implements Component {}
 class ThrowingListener implements EntityListener {
   @override
   void entityAdded(Entity? entity) {
-    throw new Exception("throwing");
+    throw Exception("throwing");
   }
 
   @override
   void entityRemoved(Entity? entity) {
-    throw new Exception("throwing");
+    throw Exception("throwing");
   }
 }
 

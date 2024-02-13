@@ -1,18 +1,19 @@
-/*******************************************************************************
- * Copyright 2014 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+/// *****************************************************************************
+/// Copyright 2014 See AUTHORS file.
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///   http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///****************************************************************************
+library;
 
 import '../helpers.dart';
 import 'package:ashley_dart/ashley_dart.dart';
@@ -52,10 +53,7 @@ class OrderComponent implements Component {
   String? name;
   int? zLayer;
 
-  OrderComponent(String name, int zLayer) {
-    this.name = name;
-    this.zLayer = zLayer;
-  }
+  OrderComponent(String this.name, int this.zLayer);
 }
 
 class SpyComponent implements Component {
@@ -67,8 +65,8 @@ class IndexComponent implements Component {
 }
 
 class IteratingComponentRemovalSystem extends SortedIteratingSystem {
-  ComponentMapper<SpyComponent> _sm;
-  ComponentMapper<IndexComponent> _im;
+  final ComponentMapper<SpyComponent> _sm;
+  final ComponentMapper<IndexComponent> _im;
 
   IteratingComponentRemovalSystem()
       : _sm = ComponentMapper.getFor(SpyComponent),
@@ -90,8 +88,8 @@ class IteratingComponentRemovalSystem extends SortedIteratingSystem {
 
 class IteratingRemovalSystem extends SortedIteratingSystem {
   Engine? _e;
-  ComponentMapper<SpyComponent> _sm;
-  ComponentMapper<IndexComponent> _im;
+  final ComponentMapper<SpyComponent> _sm;
+  final ComponentMapper<IndexComponent> _im;
 
   IteratingRemovalSystem()
       : _sm = ComponentMapper.getFor(SpyComponent),
@@ -102,7 +100,7 @@ class IteratingRemovalSystem extends SortedIteratingSystem {
   @override
   void addedToEngine(Engine? e) {
     super.addedToEngine(e);
-    this._e = e;
+    _e = e;
   }
 
   @override

@@ -1,18 +1,19 @@
-/*******************************************************************************
- * Copyright 2014 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+/// *****************************************************************************
+/// Copyright 2014 See AUTHORS file.
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///   http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///****************************************************************************
+library;
 
 import 'package:ashley_dart/ashley_dart.dart';
 import 'package:ashley_dart/utils/constructor_pool.dart';
@@ -55,22 +56,29 @@ class EntityPool extends Pool<PooledEntity> {
 }
 
 class ComponentPools {
-  Map<Type, ConstructorPool> _pools = {};
+  final Map<Type, ConstructorPool> _pools = {};
   final Map<Type, Constructor> _constructors;
-  int _initialSize;
-  int _maxSize;
+  final int _initialSize;
+  final int _maxSize;
 
   ComponentPools(this._constructors, this._initialSize, this._maxSize);
 
-  T? obtain<T>(Type type) {
-    ConstructorPool? pool = _pools[type];
+  T obtain<T>(Type type) {
+    ConstructorPool<T>? pool = _pools[type] as ConstructorPool<T>?;
 
     if (pool == null) {
-      pool = ConstructorPool(type, _constructors[type], _initialSize, _maxSize);
+      Constructor<T>? constructor = _constructors[type] as Constructor<T>?;
+
+      if (constructor == null) {
+        throw Exception(
+            "Class cannot be created (missing no-arg constructor): ${type.runtimeType}");
+      }
+
+      pool = ConstructorPool<T>(type, constructor, _initialSize, _maxSize);
       _pools[type] = pool;
     }
 
-    return pool.obtain() as T?;
+    return pool.obtain();
   }
 
   void free(Object object) {
@@ -97,27 +105,23 @@ class ComponentPools {
   }
 }
 
-/**
- * Supports {@link Entity} and {@link Component} pooling. This improves performance in environments where creating/deleting
- * entities is frequent as it greatly reduces memory allocation.
- * <ul>
- * <li>Create entities using {@link #createEntity()}</li>
- * <li>Create components using {@link #createComponent(Class)}</li>
- * <li>Components should implement the {@link Poolable} interface when in need to reset its state upon removal</li>
- * </ul>
- * @author David Saltares
- */
+/// Supports {@link Entity} and {@link Component} pooling. This improves performance in environments where creating/deleting
+/// entities is frequent as it greatly reduces memory allocation.
+/// <ul>
+/// <li>Create entities using {@link #createEntity()}</li>
+/// <li>Create components using {@link #createComponent(Class)}</li>
+/// <li>Components should implement the {@link Poolable} interface when in need to reset its state upon removal</li>
+/// </ul>
+/// @author David Saltares
 class PooledEngine extends Engine {
   late EntityPool _entityPool;
   ComponentPools? _componentPools;
 
-  /**
-	 * Creates PooledEngine with the specified pools size configurations.
-	 * @param entityPoolInitialSize initial number of pre-allocated entities.
-	 * @param entityPoolMaxSize maximum number of pooled entities.
-	 * @param componentPoolInitialSize initial size for each component type pool.
-	 * @param componentPoolMaxSize maximum size for each component type pool.
-	 */
+  /// Creates PooledEngine with the specified pools size configurations.
+  /// @param entityPoolInitialSize initial number of pre-allocated entities.
+  /// @param entityPoolMaxSize maximum number of pooled entities.
+  /// @param componentPoolInitialSize initial size for each component type pool.
+  /// @param componentPoolMaxSize maximum size for each component type pool.
   PooledEngine(
       [int entityPoolInitialSize = 10,
       int entityPoolMaxSize = 100,
@@ -130,26 +134,22 @@ class PooledEngine extends Engine {
         constructors, componentPoolInitialSize, componentPoolMaxSize);
   }
 
-  /** @return Clean {@link Entity} from the Engine pool. In order to add it to the {@link Engine}, use {@link #addEntity(Entity)}. @{@link Override {@link Engine#createEntity()}} */
+  /// @return Clean {@link Entity} from the Engine pool. In order to add it to the {@link Engine}, use {@link #addEntity(Entity)}. @{@link Override {@link Engine#createEntity()}}
   @override
   Entity createEntity() {
     return _entityPool.obtain();
   }
 
-  /**
-	 * Retrieves a {@link Component} from the {@link Engine} pool. It will be placed back in the pool whenever it's removed
-	 * from an {@link Entity} or the {@link Entity} itself it's removed.
-	 * Overrides the default implementation of Engine (creating a Object)
-	 */
+  /// Retrieves a {@link Component} from the {@link Engine} pool. It will be placed back in the pool whenever it's removed
+  /// from an {@link Entity} or the {@link Entity} itself it's removed.
+  /// Overrides the default implementation of Engine (creating a Object)
   @override
   T? createComponent<T extends Component>(Type componentType) {
     return _componentPools!.obtain<T>(componentType);
   }
 
-  /**
-	 * Removes all free entities and components from their pools. Although this will likely result in garbage collection, it will
-	 * free up memory.
-	 */
+  /// Removes all free entities and components from their pools. Although this will likely result in garbage collection, it will
+  /// free up memory.
   void clearPools() {
     _entityPool.clear();
     _componentPools!.clear();

@@ -23,10 +23,12 @@ class RemoveEntityListener implements EntityListener {
 
   const RemoveEntityListener(this._engine);
 
+  @override
   void entityRemoved(Entity? entity) {
     _engine.addEntity(Entity());
   }
 
+  @override
   void entityAdded(Entity? entity) {}
 }
 
@@ -34,8 +36,11 @@ class AddEntityListener implements EntityListener {
   final Engine _engine;
 
   const AddEntityListener(this._engine);
+
+  @override
   void entityRemoved(Entity? entity) {}
 
+  @override
   void entityAdded(Entity? entity) {
     _engine.addEntity(Entity());
   }
@@ -47,10 +52,12 @@ class NoFamilyRemoveEntityListener implements EntityListener {
 
   const NoFamilyRemoveEntityListener(this._family, this._engine);
 
+  @override
   void entityRemoved(Entity? entity) {
     if (_family.matches(entity!)) _engine.addEntity(Entity());
   }
 
+  @override
   void entityAdded(Entity? entity) {}
 }
 
@@ -60,8 +67,10 @@ class NoFamilyAddEntityListener implements EntityListener {
 
   const NoFamilyAddEntityListener(this._family, this._engine);
 
+  @override
   void entityRemoved(Entity? entity) {}
 
+  @override
   void entityAdded(Entity? entity) {
     if (_family.matches(entity!)) _engine.addEntity(Entity());
   }

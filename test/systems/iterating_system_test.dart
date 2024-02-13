@@ -1,18 +1,19 @@
-/*******************************************************************************
- * Copyright 2014 See AUTHORS file.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
+/// *****************************************************************************
+/// Copyright 2014 See AUTHORS file.
+///
+/// Licensed under the Apache License, Version 2.0 (the "License");
+/// you may not use this file except in compliance with the License.
+/// You may obtain a copy of the License at
+///
+///   http://www.apache.org/licenses/LICENSE-2.0
+///
+/// Unless required by applicable law or agreed to in writing, software
+/// distributed under the License is distributed on an "AS IS" BASIS,
+/// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+/// See the License for the specific language governing permissions and
+/// limitations under the License.
+///****************************************************************************
+library;
 
 import '../helpers.dart';
 import 'package:ashley_dart/ashley_dart.dart';
@@ -29,7 +30,7 @@ class ComponentC implements Component {}
 class IteratingSystemMock extends IteratingSystem {
   int numUpdates = 0;
 
-  IteratingSystemMock(Family family) : super(family);
+  IteratingSystemMock(super.family);
 
   @override
   void processEntity(Entity? entity, double deltaTime) {
@@ -68,18 +69,13 @@ class IteratingComponentRemovalSystem extends IteratingSystem {
 }
 
 class IteratingRemovalSystem extends IteratingSystem {
-  ComponentMapper<SpyComponent> _sm;
-  ComponentMapper<IndexComponent> _im;
+  final ComponentMapper<SpyComponent> _sm;
+  final ComponentMapper<IndexComponent> _im;
 
   IteratingRemovalSystem()
       : _sm = ComponentMapper.getFor(SpyComponent),
         _im = ComponentMapper.getFor(IndexComponent),
         super(Family.all([SpyComponent, IndexComponent]).get());
-
-  @override
-  void addedToEngine(Engine? engine) {
-    super.addedToEngine(engine);
-  }
 
   @override
   void processEntity(Entity? entity, double deltaTime) {

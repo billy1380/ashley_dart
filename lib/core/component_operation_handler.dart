@@ -5,29 +5,29 @@ abstract class BooleanInformer {
   bool get value;
 }
 
-class ComponentOperationPool extends Pool<_ComponentOperation> {
+class ComponentOperationPool extends Pool<ComponentOperation> {
   @override
-  _ComponentOperation newObject() {
-    return _ComponentOperation();
+  ComponentOperation newObject() {
+    return ComponentOperation();
   }
 }
 
 enum ComponentOperationType {
-  Add,
-  Remove,
+  add,
+  remove,
 }
 
-class _ComponentOperation implements Poolable {
+class ComponentOperation implements Poolable {
   ComponentOperationType? type;
   Entity? entity;
 
   void makeAdd(Entity entity) {
-    this.type = ComponentOperationType.Add;
+    type = ComponentOperationType.add;
     this.entity = entity;
   }
 
   void makeRemove(Entity entity) {
-    this.type = ComponentOperationType.Remove;
+    type = ComponentOperationType.remove;
     this.entity = entity;
   }
 
@@ -38,15 +38,15 @@ class _ComponentOperation implements Poolable {
 }
 
 class ComponentOperationHandler {
-  BooleanInformer _delayed;
-  ComponentOperationPool _operationPool = ComponentOperationPool();
-  List<_ComponentOperation> _operations = [];
+  final BooleanInformer _delayed;
+  final ComponentOperationPool _operationPool = ComponentOperationPool();
+  final List<ComponentOperation> _operations = [];
 
   ComponentOperationHandler(this._delayed);
 
   void add(Entity entity) {
     if (_delayed.value) {
-      _ComponentOperation operation = _operationPool.obtain();
+      ComponentOperation operation = _operationPool.obtain();
       operation.makeAdd(entity);
       _operations.add(operation);
     } else {
@@ -56,7 +56,7 @@ class ComponentOperationHandler {
 
   void remove(Entity entity) {
     if (_delayed.value) {
-      _ComponentOperation operation = _operationPool.obtain();
+      ComponentOperation operation = _operationPool.obtain();
       operation.makeRemove(entity);
       _operations.add(operation);
     } else {
@@ -70,13 +70,13 @@ class ComponentOperationHandler {
 
   void processOperations() {
     for (int i = 0; i < _operations.length; ++i) {
-      _ComponentOperation operation = _operations[i];
+      ComponentOperation operation = _operations[i];
 
       switch (operation.type) {
-        case ComponentOperationType.Add:
+        case ComponentOperationType.add:
           operation.entity!.notifyComponentAdded();
           break;
-        case ComponentOperationType.Remove:
+        case ComponentOperationType.remove:
           operation.entity!.notifyComponentRemoved();
           break;
         default:
